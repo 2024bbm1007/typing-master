@@ -327,22 +327,22 @@ const ACHIEVEMENTS = [
   { id: 'speed_60', name: 'Speed Racer', desc: 'Reach 60 WPM', icon: '🏎️', requirement: { type: 'wpm', value: 60 } },
   { id: 'speed_80', name: 'Fast Typer', desc: 'Reach 80 WPM', icon: '🔥', requirement: { type: 'wpm', value: 80 } },
   { id: 'speed_100', name: 'Lightning Fingers', desc: 'Reach 100 WPM', icon: '⚡⚡', requirement:  { type: 'wpm', value:  100 } },
-  { id:  'speed_120', name: 'Speed Demon', desc: 'Reach 120 WPM', icon: '👹', requirement: { type: 'wpm', value: 120 } },
+  { id: 'speed_120', name: 'Speed Demon', desc: 'Reach 120 WPM', icon: '👹', requirement: { type: 'wpm', value: 120 } },
   { id: 'perfect', name: 'Perfect Typist', desc: '100% accuracy', icon: '💯', requirement: { type: 'accuracy', value: 100 } },
   { id: 'accurate_95', name: 'Nearly Perfect', desc: '95%+ accuracy 10 times', icon: '🎯', requirement:  { type: 'accuracy_streak', value: 10 } },
   { id: 'streak_7', name: 'Weekly Warrior', desc: '7 day streak', icon: '🔥', requirement: { type: 'streak', value:  7 } },
-  { id:  'streak_30', name: 'Monthly Master', desc: '30 day streak', icon: '🔥🔥', requirement:  { type: 'streak', value: 30 } },
-  { id: 'sessions_10', name: 'Getting Started', desc: '10 sessions', icon:  '📝', requirement: { type: 'sessions', value: 10 } },
+  { id: 'streak_30', name: 'Monthly Master', desc: '30 day streak', icon: '🔥🔥', requirement:  { type: 'streak', value: 30 } },
+  { id: 'sessions_10', name: 'Getting Started', desc: '10 sessions', icon: '📝', requirement: { type: 'sessions', value: 10 } },
   { id: 'sessions_50', name: 'Regular Practitioner', desc: '50 sessions', icon: '📚', requirement: { type: 'sessions', value: 50 } },
-  { id: 'sessions_100', name:  'Dedicated', desc: '100 sessions', icon: '🏆', requirement: { type: 'sessions', value: 100 } },
-  { id: 'lessons_10', name:  'Quick Learner', desc: 'Complete 10 lessons', icon: '🎓', requirement: { type: 'lessons', value: 10 } },
+  { id: 'sessions_100', name: 'Dedicated', desc: '100 sessions', icon: '🏆', requirement: { type: 'sessions', value: 100 } },
+  { id: 'lessons_10', name: 'Quick Learner', desc: 'Complete 10 lessons', icon: '🎓', requirement: { type: 'lessons', value: 10 } },
   { id: 'lessons_all', name: 'Lesson Master', desc: 'Complete all lessons', icon: '🏅', requirement: { type: 'lessons', value: 55 } },
   { id: 'essays_5', name: 'Essay Novice', desc: 'Complete 5 essays', icon: '✍️', requirement:  { type: 'essays', value: 5 } },
   { id: 'essays_all', name: 'Essay Master', desc: 'Complete all essays', icon: '📜', requirement: { type: 'essays', value: 20 } },
   { id: 'time_1hr', name: 'One Hour', desc: 'Practice for 1 hour', icon: '⏱️', requirement: { type: 'time', value:  3600 } },
   { id: 'time_5hr', name: 'Five Hours', desc: 'Practice for 5 hours', icon: '⏱️⏱️', requirement: { type: 'time', value:  18000 } },
   { id: 'premium', name: 'Premium Member', desc: 'Unlock premium', icon: '👑', requirement: { type: 'premium', value: true } },
-  { id: 'tech_master', name: 'Code Typer', desc: 'Complete all tech docs', icon:  '💻', requirement: { type: 'docs', value: 8 } }
+  { id: 'tech_master', name: 'Code Typer', desc: 'Complete all tech docs', icon: '💻', requirement: { type: 'docs', value: 8 } }
 ];
 
 // ============================================
@@ -484,7 +484,7 @@ export default function TypingMasterApp() {
   }, [isTyping, startTime, userInput]);
 
   const checkStreak = (data) => {
-    if (! data.lastPracticeDate) return;
+    if (!data.lastPracticeDate) return;
     const today = new Date().toDateString();
     const lastDate = new Date(data.lastPracticeDate).toDateString();
     const yesterday = new Date(Date.now() - 86400000).toDateString();
@@ -521,7 +521,7 @@ export default function TypingMasterApp() {
   const handleTyping = useCallback((e) => {
     const value = e.target.value;
     
-    if (! isTyping && value.length > 0) {
+    if (!isTyping && value.length > 0) {
       setIsTyping(true);
       setStartTime(Date.now());
     }
@@ -616,19 +616,19 @@ export default function TypingMasterApp() {
     };
 
     if (finalAccuracy >= 95) {
-      if (currentLesson && ! userData.lessonsCompleted.includes(currentLesson.id)) {
+      if (currentLesson && !userData.lessonsCompleted.includes(currentLesson.id)) {
         updatedData.lessonsCompleted = [...userData.lessonsCompleted, currentLesson.id];
       }
       if (currentEssay && !userData.essaysCompleted.includes(currentEssay.id)) {
         updatedData.essaysCompleted = [...userData.essaysCompleted, currentEssay.id];
       }
-      if (currentDoc && ! userData.docsCompleted.includes(currentDoc.id)) {
+      if (currentDoc && !userData.docsCompleted.includes(currentDoc.id)) {
         updatedData.docsCompleted = [...userData.docsCompleted, currentDoc.id];
       }
     }
 
     const newAchievements = checkAchievements(updatedData);
-    const brandNewAchievements = newAchievements. filter(a => ! userData.achievements.includes(a));
+    const brandNewAchievements = newAchievements. filter(a => !userData.achievements.includes(a));
     updatedData.achievements = [...new Set([...userData.achievements, ...newAchievements])];
 
     setUserData(updatedData);
@@ -831,7 +831,7 @@ export default function TypingMasterApp() {
   };
 
   const ProgressChart = () => {
-    if (! userData.isPremium) {
+    if (!userData.isPremium) {
       return (
         <div className="bg-gray-800/50 border-2 border-yellow-500/30 rounded-xl p-6 text-center">
           <Lock className="w-10 h-10 text-yellow-400 mx-auto mb-3" />
@@ -914,7 +914,7 @@ export default function TypingMasterApp() {
               <h2 className="text-2xl font-bold bg-gradient-to-r from-yellow-400 to-orange-500 bg-clip-text text-transparent">
                 Premium Features
               </h2>
-              <button onClick={() => setShowPaymentModal(false)} className="text-gray-400 hover: text-white text-xl">×</button>
+              <button onClick={() => setShowPaymentModal(false)} className="text-gray-400 hover:text-white text-xl">×</button>
             </div>
 
             <div className="space-y-3 mb-6">
@@ -998,7 +998,7 @@ export default function TypingMasterApp() {
             </div>
             
             <div className="flex items-center gap-2">
-              {! userData.isPremium && (
+              {!userData.isPremium && (
                 <button
                   onClick={() => setShowPaymentModal(true)}
                   className="px-3 py-1.5 bg-gradient-to-r from-yellow-500 to-orange-500 rounded-lg font-semibold text-xs hover:shadow-lg flex items-center gap-1"
@@ -1034,12 +1034,12 @@ export default function TypingMasterApp() {
                 className={`px-3 py-1.5 rounded-lg font-medium text-sm transition-all whitespace-nowrap flex items-center gap-1.5 ${
                   mode === tab.id 
                     ? 'bg-gradient-to-r from-cyan-500 to-blue-600 text-white' 
-                    :  'text-gray-400 hover: text-white hover: bg-gray-800'
+                    : 'text-gray-400 hover:text-white hover:bg-gray-800'
                 }`}
               >
                 <tab.icon className="w-4 h-4" />
                 {tab.label}
-                {tab.id === 'analytics' && ! userData.isPremium && <Lock className="w-3 h-3" />}
+                {tab.id === 'analytics' && !userData.isPremium && <Lock className="w-3 h-3" />}
               </button>
             ))}
           </nav>
@@ -1111,7 +1111,7 @@ export default function TypingMasterApp() {
               </button>
               <button
                 onClick={() => setMode('technical')}
-                className="p-5 bg-gradient-to-br from-emerald-500/10 to-emerald-600/10 border border-emerald-500/30 rounded-xl hover: border-emerald-400 transition-all text-left"
+                className="p-5 bg-gradient-to-br from-emerald-500/10 to-emerald-600/10 border border-emerald-500/30 rounded-xl hover:border-emerald-400 transition-all text-left"
               >
                 <Code className="w-7 h-7 text-emerald-400 mb-2" />
                 <h3 className="font-bold mb-1">Technical</h3>
@@ -1137,7 +1137,7 @@ export default function TypingMasterApp() {
                 <div className="flex flex-wrap gap-3">
                   {userData.achievements.slice(-6).map(achId => {
                     const ach = ACHIEVEMENTS. find(a => a.id === achId);
-                    if (! ach) return null;
+                    if (!ach) return null;
                     return (
                       <div key={achId} className="bg-gray-900/50 rounded-lg px-3 py-2 border border-yellow-500/20">
                         <span className="text-xl mr-2">{ach.icon}</span>
@@ -1163,7 +1163,7 @@ export default function TypingMasterApp() {
                 <button
                   onClick={() => setSelectedSection('all')}
                   className={`px-3 py-1.5 rounded-lg text-sm font-medium ${
-                    selectedSection === 'all' ?  'bg-cyan-500 text-white' :  'bg-gray-800 text-gray-400'
+                    selectedSection === 'all' ? 'bg-cyan-500 text-white' : 'bg-gray-800 text-gray-400'
                   }`}
                 >
                   All
@@ -1191,9 +1191,9 @@ export default function TypingMasterApp() {
                   <button
                     key={lesson.id}
                     onClick={() => isUnlocked && startSession(lesson.text, lesson)}
-                    disabled={! isUnlocked}
+                    disabled={!isUnlocked}
                     className={`p-4 rounded-xl text-left transition-all ${
-                      ! isUnlocked 
+                      !isUnlocked 
                         ? 'bg-gray-800/30 border border-gray-700/50 opacity-50 cursor-not-allowed' 
                         : isCompleted
                         ? 'bg-emerald-500/10 border border-emerald-500/30 hover:bg-emerald-500/20'
@@ -1206,14 +1206,13 @@ export default function TypingMasterApp() {
                         <div className="font-bold">{lesson.id}. {lesson.title}</div>
                       </div>
                       {isCompleted && <CheckCircle className="w-5 h-5 text-emerald-400" />}
-                      {! isUnlocked && <Lock className="w-5 h-5 text-gray-500" />}
+                      {!isUnlocked && <Lock className="w-5 h-5 text-gray-500" />}
                     </div>
                     <div className="text-xs text-gray-400 truncate mb-2 font-mono">{lesson.text}</div>
                     <div className="flex items-center justify-between">
                       <span className={`px-2 py-0.5 rounded text-xs ${
                         lesson.difficulty === 'beginner' ? 'bg-green-500/20 text-green-400' :  
-                        lesson.difficulty === 'intermediate' ? 'bg-yellow-500/20 text-yellow-400' :  
-                        'bg-red-500/20 text-red-400'
+                        lesson.difficulty === 'intermediate' ? 'bg-yellow-500/20 text-yellow-400' : 'bg-red-500/20 text-red-400'
                       }`}>
                         {lesson.difficulty}
                       </span>
@@ -1256,8 +1255,7 @@ export default function TypingMasterApp() {
                     <div className="flex items-center justify-between">
                       <span className={`px-2 py-0.5 rounded text-xs ${
                         essay.difficulty === 'beginner' ? 'bg-green-500/20 text-green-400' : 
-                        essay.difficulty === 'intermediate' ? 'bg-yellow-500/20 text-yellow-400' :  
-                        'bg-red-500/20 text-red-400'
+                        essay.difficulty === 'intermediate' ? 'bg-yellow-500/20 text-yellow-400' : 'bg-red-500/20 text-red-400'
                       }`}>
                         {essay.difficulty}
                       </span>
@@ -1291,7 +1289,7 @@ export default function TypingMasterApp() {
                     onClick={() => startSession(doc.text, null, null, doc)}
                     className={`p-5 rounded-xl text-left transition-all ${
                       isCompleted
-                        ? 'bg-emerald-500/10 border border-emerald-500/30 hover: bg-emerald-500/20'
+                        ? 'bg-emerald-500/10 border border-emerald-500/30 hover:bg-emerald-500/20'
                         : 'bg-gray-800/50 border border-gray-700 hover:bg-gray-700/50 hover:border-emerald-500/50'
                     }`}
                   >
@@ -1373,7 +1371,7 @@ export default function TypingMasterApp() {
                 Advanced Analytics
               </h2>
               <p className="text-gray-400 text-sm">
-                {userData.isPremium ?  'Deep insights into your performance' : 'Unlock premium for detailed analytics'}
+                {userData.isPremium ? 'Deep insights into your performance' : 'Unlock premium for detailed analytics'}
               </p>
             </div>
 
@@ -1453,8 +1451,8 @@ export default function TypingMasterApp() {
                       key={ach.id}
                       className={`rounded-lg p-3 text-center border ${
                         unlocked 
-                          ?  'bg-yellow-500/10 border-yellow-500/30' 
-                          :  'bg-gray-900/50 border-gray-700/50 opacity-40'
+                          ? 'bg-yellow-500/10 border-yellow-500/30' 
+                          : 'bg-gray-900/50 border-gray-700/50 opacity-40'
                       }`}
                     >
                       <div className="text-2xl mb-1">{ach.icon}</div>
@@ -1522,7 +1520,7 @@ export default function TypingMasterApp() {
               </div>
 
               {/* Input Field */}
-              {! sessionComplete && (
+              {!sessionComplete && (
                 <input
                   ref={inputRef}
                   type="text"
@@ -1582,8 +1580,8 @@ export default function TypingMasterApp() {
                         startSession(nextLesson.text, nextLesson);
                       }
                     }}
-                    disabled={! LESSONS.find(l => l.id === currentLesson.id + 1) || ! userData.lessonsCompleted. includes(currentLesson.id)}
-                    className="px-5 py-2 bg-cyan-600 hover:bg-cyan-500 disabled:opacity-50 disabled: cursor-not-allowed rounded-lg font-medium flex items-center gap-2"
+                    disabled={!LESSONS.find(l => l.id === currentLesson.id + 1) || !userData.lessonsCompleted. includes(currentLesson.id)}
+                    className="px-5 py-2 bg-cyan-600 hover:bg-cyan-500 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg font-medium flex items-center gap-2"
                   >
                     Next Lesson
                     <ChevronRight className="w-4 h-4" />
@@ -1597,7 +1595,7 @@ export default function TypingMasterApp() {
                       if (nextEssay) startSession(nextEssay.text, null, nextEssay);
                     }}
                     disabled={!ESSAYS.find(e => e.id === currentEssay.id + 1)}
-                    className="px-5 py-2 bg-purple-600 hover: bg-purple-500 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg font-medium flex items-center gap-2"
+                    className="px-5 py-2 bg-purple-600 hover:bg-purple-500 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg font-medium flex items-center gap-2"
                   >
                     Next Essay
                     <ChevronRight className="w-4 h-4" />
@@ -1611,7 +1609,7 @@ export default function TypingMasterApp() {
                     else if (currentDoc) setMode('technical');
                     else setMode('home');
                   }}
-                  className="px-5 py-2 bg-gray-700 hover: bg-gray-600 rounded-lg font-medium flex items-center gap-2"
+                  className="px-5 py-2 bg-gray-700 hover:bg-gray-600 rounded-lg font-medium flex items-center gap-2"
                 >
                   <ChevronLeft className="w-4 h-4" />
                   Back
