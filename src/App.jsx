@@ -11,6 +11,12 @@ import TypingArea from './components/TypingArea';
 import Keyboard from './components/Keyboard';
 import ModeSelector from './components/ModeSelector';
 
+// Import Ad and Payment components
+import { AdBanner, AdInterstitial, FeatureGate } from './components/Ads';
+import { PaymentModal } from './components/Payment';
+import AdService from './services/adService';
+import AdUnlockService from './services/adUnlockService';
+
 
 // ============================================
 // MAIN APPLICATION
@@ -22,6 +28,7 @@ export default function TypingMasterApp() {
   const [showPaymentModal, setShowPaymentModal] = useState(false);
   const [showCustomTextModal, setShowCustomTextModal] = useState(false);
   const [notification, setNotification] = useState(null);
+  const [showInterstitial, setShowInterstitial] = useState(false);
   
   const [practiceText, setPracticeText] = useState('');
   const [userInput, setUserInput] = useState('');
@@ -227,6 +234,11 @@ export default function TypingMasterApp() {
         showNotificationMsg(`🎉 Achievement unlocked:  ${ach.name}`);
       }
     }
+
+    // Check if interstitial ad should be shown
+    if (AdService.shouldShowInterstitial(updatedData.totalSessions, updatedData.isPremium)) {
+      setTimeout(() => setShowInterstitial(true), 1000);
+    }
   }, [sessionComplete, startTime, userData, currentLesson, currentEssay, currentDoc, practiceText]);
 
   const calculateLevel = (xp) => {
@@ -317,7 +329,10 @@ export default function TypingMasterApp() {
 
   const isLessonUnlocked = (lesson) => {
     if (lesson.id === 1) return true;
-    return userData.lessonsCompleted.includes(lesson.id - 1);
+    // Check if previous lesson is completed OR if user has ad-unlocked this lesson
+    const prevCompleted = userData.lessonsCompleted.includes(lesson.id - 1);
+    const adUnlocked = AdUnlockService.isFeatureAccessible('unlockNextLesson', userData.isPremium);
+    return prevCompleted || adUnlocked;
   };
 
   const renderChar = (char, index) => {
@@ -349,22 +364,6 @@ export default function TypingMasterApp() {
 
   // Analytics Components
   const WeakKeyAnalysis = () => {
-    if (!userData.isPremium) {
-      return (
-        <div className="bg-gray-800/50 border-2 border-yellow-500/30 rounded-xl p-6 text-center">
-          <Lock className="w-10 h-10 text-yellow-400 mx-auto mb-3" />
-          <h3 className="text-lg font-bold mb-2">Weak Key Analysis</h3>
-          <p className="text-gray-400 text-sm mb-4">Identify your problem keys</p>
-          <button
-            onClick={() => setShowPaymentModal(true)}
-            className="px-4 py-2 bg-gradient-to-r from-yellow-500 to-orange-500 rounded-lg font-semibold text-sm"
-          >
-            Unlock Premium ₹19
-          </button>
-        </div>
-      );
-    }
-
     const sortedKeys = Object.entries(userData.keyErrors)
       .sort((a, b) => b[1] - a[1])
       .slice(0, 8);
@@ -412,22 +411,6 @@ export default function TypingMasterApp() {
   };
 
   const ProgressChart = () => {
-    if (!userData.isPremium) {
-      return (
-        <div className="bg-gray-800/50 border-2 border-yellow-500/30 rounded-xl p-6 text-center">
-          <Lock className="w-10 h-10 text-yellow-400 mx-auto mb-3" />
-          <h3 className="text-lg font-bold mb-2">Progress Charts</h3>
-          <p className="text-gray-400 text-sm mb-4">Track improvement over time</p>
-          <button
-            onClick={() => setShowPaymentModal(true)}
-            className="px-4 py-2 bg-gradient-to-r from-yellow-500 to-orange-500 rounded-lg font-semibold text-sm"
-          >
-            Unlock Premium ₹19
-          </button>
-        </div>
-      );
-    }
-
     if (userData.wpmHistory.length < 3) {
       return (
         <div className="bg-gray-800/50 border border-gray-700 rounded-xl p-6">
@@ -487,39 +470,22 @@ export default function TypingMasterApp() {
         </div>
       )}
 
+      {/* Interstitial Ad */}
+      {showInterstitial && (
+        <AdInterstitial
+          onClose={() => setShowInterstitial(false)}
+          onAdComplete={() => {
+            console.log('Interstitial ad completed');
+          }}
+        />
+      )}
+
       {/* Payment Modal */}
       {showPaymentModal && (
-        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-gray-800 border-2 border-yellow-500/50 rounded-2xl p-6 max-w-md w-full">
-            <div className="flex justify-between items-start mb-4">
-              <h2 className="text-2xl font-bold bg-gradient-to-r from-yellow-400 to-orange-500 bg-clip-text text-transparent">
-                Premium Features
-              </h2>
-              <button onClick={() => setShowPaymentModal(false)} className="text-gray-400 hover:text-white text-xl">×</button>
-            </div>
-
-            <div className="space-y-3 mb-6">
-              {['Detailed Performance Graphs', 'Weak Key Identification', 'Speed vs Accuracy Analysis', 'Advanced Analytics Dashboard'].map(feature => (
-                <div key={feature} className="flex items-center gap-2">
-                  <CheckCircle className="w-4 h-4 text-emerald-400 flex-shrink-0" />
-                  <span className="text-sm">{feature}</span>
-                </div>
-              ))}
-            </div>
-
-            <div className="bg-yellow-500/10 border border-yellow-500/30 rounded-xl p-4 mb-6 text-center">
-              <div className="text-4xl font-bold text-yellow-400">₹19</div>
-              <div className="text-sm text-gray-400">Lifetime access</div>
-            </div>
-
-            <button
-              onClick={handlePayment}
-              className="w-full py-3 bg-gradient-to-r from-yellow-500 to-orange-500 rounded-xl font-bold hover:shadow-lg transition-all"
-            >
-              Unlock Premium Now
-            </button>
-          </div>
-        </div>
+        <PaymentModal
+          onClose={() => setShowPaymentModal(false)}
+          onPaymentSuccess={handlePayment}
+        />
       )}
 
       {/* Custom Text Modal */}
@@ -627,6 +593,13 @@ export default function TypingMasterApp() {
           </nav>
         </div>
       </header>
+
+      {/* Header Banner Ad */}
+      {!userData.isPremium && (
+        <div className="max-w-7xl mx-auto px-4 py-3 flex justify-center">
+          <AdBanner adSlot="headerBanner" size="728x90" />
+        </div>
+      )}
 
        {/* Main Content */}
        <main className="max-w-7xl mx-auto px-4 py-6">
@@ -765,42 +738,50 @@ export default function TypingMasterApp() {
             </div>
             
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {filteredLessons. map(lesson => {
+              {filteredLessons. map((lesson, index) => {
                 const isCompleted = userData.lessonsCompleted.includes(lesson.id);
                 const isUnlocked = isLessonUnlocked(lesson);
                 
                 return (
-                  <button
-                    key={lesson.id}
-                    onClick={() => isUnlocked && startSession(lesson.text, lesson)}
-                    disabled={!isUnlocked}
-                    className={`p-4 rounded-xl text-left transition-all ${
-                      !isUnlocked 
-                        ? 'bg-gray-800/30 border border-gray-700/50 opacity-50 cursor-not-allowed' 
-                        : isCompleted
-                        ? 'bg-emerald-500/10 border border-emerald-500/30 hover:bg-emerald-500/20'
-                        : 'bg-gray-800/50 border border-gray-700 hover:bg-gray-700/50 hover:border-cyan-500/50'
-                    }`}
-                  >
-                    <div className="flex items-start justify-between mb-2">
-                      <div>
-                        <div className="text-xs text-gray-500">{lesson.section}</div>
-                        <div className="font-bold">{lesson.id}. {lesson.title}</div>
+                  <React.Fragment key={lesson.id}>
+                    <button
+                      onClick={() => isUnlocked && startSession(lesson.text, lesson)}
+                      disabled={!isUnlocked}
+                      className={`p-4 rounded-xl text-left transition-all ${
+                        !isUnlocked 
+                          ? 'bg-gray-800/30 border border-gray-700/50 opacity-50 cursor-not-allowed' 
+                          : isCompleted
+                          ? 'bg-emerald-500/10 border border-emerald-500/30 hover:bg-emerald-500/20'
+                          : 'bg-gray-800/50 border border-gray-700 hover:bg-gray-700/50 hover:border-cyan-500/50'
+                      }`}
+                    >
+                      <div className="flex items-start justify-between mb-2">
+                        <div>
+                          <div className="text-xs text-gray-500">{lesson.section}</div>
+                          <div className="font-bold">{lesson.id}. {lesson.title}</div>
+                        </div>
+                        {isCompleted && <CheckCircle className="w-5 h-5 text-emerald-400" />}
+                        {!isUnlocked && <Lock className="w-5 h-5 text-gray-500" />}
                       </div>
-                      {isCompleted && <CheckCircle className="w-5 h-5 text-emerald-400" />}
-                      {!isUnlocked && <Lock className="w-5 h-5 text-gray-500" />}
-                    </div>
-                    <div className="text-xs text-gray-400 truncate mb-2 font-mono">{lesson.text}</div>
-                    <div className="flex items-center justify-between">
-                      <span className={`px-2 py-0.5 rounded text-xs ${
-                        lesson.difficulty === 'beginner' ? 'bg-green-500/20 text-green-400' :  
-                        lesson.difficulty === 'intermediate' ? 'bg-yellow-500/20 text-yellow-400' : 'bg-red-500/20 text-red-400'
-                      }`}>
-                        {lesson.difficulty}
-                      </span>
-                      <span className="text-xs text-gray-500">~{lesson.estimatedTime}min</span>
-                    </div>
-                  </button>
+                      <div className="text-xs text-gray-400 truncate mb-2 font-mono">{lesson.text}</div>
+                      <div className="flex items-center justify-between">
+                        <span className={`px-2 py-0.5 rounded text-xs ${
+                          lesson.difficulty === 'beginner' ? 'bg-green-500/20 text-green-400' :  
+                          lesson.difficulty === 'intermediate' ? 'bg-yellow-500/20 text-yellow-400' : 'bg-red-500/20 text-red-400'
+                        }`}>
+                          {lesson.difficulty}
+                        </span>
+                        <span className="text-xs text-gray-500">~{lesson.estimatedTime}min</span>
+                      </div>
+                    </button>
+                    
+                    {/* Ad placement every 6 lessons */}
+                    {AdService.shouldShowLessonListAd(index) && !userData.isPremium && (
+                      <div className="col-span-full flex justify-center py-2">
+                        <AdBanner adSlot="lessonList" size="300x250" />
+                      </div>
+                    )}
+                  </React.Fragment>
                 );
               })}
             </div>
@@ -958,27 +939,49 @@ export default function TypingMasterApp() {
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <ProgressChart />
-              <WeakKeyAnalysis />
+              {/* Progress Charts - Can unlock with ads */}
+              <FeatureGate 
+                featureId="progressCharts" 
+                isPremium={userData.isPremium}
+                onUpgradeToPremium={() => setShowPaymentModal(true)}
+              >
+                <ProgressChart />
+              </FeatureGate>
+
+              {/* Weak Key Analysis - Can unlock with ads */}
+              <FeatureGate 
+                featureId="weakKeyAnalysis" 
+                isPremium={userData.isPremium}
+                onUpgradeToPremium={() => setShowPaymentModal(true)}
+              >
+                <WeakKeyAnalysis />
+              </FeatureGate>
             </div>
 
-            {userData.isPremium && userData.sessionHistory.length > 0 && (
-              <div className="bg-gray-800/50 border border-gray-700 rounded-xl p-6">
-                <h3 className="font-bold mb-4">Recent Sessions</h3>
-                <div className="space-y-2">
-                  {userData.sessionHistory.slice(-10).reverse().map((session, idx) => (
-                    <div key={idx} className="flex items-center justify-between bg-gray-900/50 rounded-lg p-3">
-                      <span className="text-sm text-gray-400">
-                        {new Date(session.date).toLocaleDateString()}
-                      </span>
-                      <div className="flex items-center gap-4">
-                        <span className="text-cyan-400 font-semibold">{session.wpm} WPM</span>
-                        <span className="text-emerald-400 font-semibold">{session.accuracy}%</span>
+            {/* Session History - Can unlock with ads */}
+            {userData.sessionHistory.length > 0 && (
+              <FeatureGate 
+                featureId="sessionHistory" 
+                isPremium={userData.isPremium}
+                onUpgradeToPremium={() => setShowPaymentModal(true)}
+              >
+                <div className="bg-gray-800/50 border border-gray-700 rounded-xl p-6">
+                  <h3 className="font-bold mb-4">Recent Sessions</h3>
+                  <div className="space-y-2">
+                    {userData.sessionHistory.slice(-10).reverse().map((session, idx) => (
+                      <div key={idx} className="flex items-center justify-between bg-gray-900/50 rounded-lg p-3">
+                        <span className="text-sm text-gray-400">
+                          {new Date(session.date).toLocaleDateString()}
+                        </span>
+                        <div className="flex items-center gap-4">
+                          <span className="text-cyan-400 font-semibold">{session.wpm} WPM</span>
+                          <span className="text-emerald-400 font-semibold">{session.accuracy}%</span>
+                        </div>
                       </div>
-                    </div>
-                  ))}
+                    ))}
+                  </div>
                 </div>
-              </div>
+              </FeatureGate>
             )}
           </div>
         )}
@@ -1119,29 +1122,38 @@ export default function TypingMasterApp() {
 
               {/* Session Results */}
               {sessionComplete && sessionResults && (
-                <div className="bg-emerald-500/10 border border-emerald-500/30 rounded-xl p-5 mb-5 text-center">
-                  <h3 className="text-xl font-bold text-emerald-400 mb-3">Session Complete!</h3>
-                  <div className="grid grid-cols-3 gap-4 mb-4">
-                    <div>
-                      <div className="text-2xl font-bold text-cyan-400">{sessionResults.wpm}</div>
-                      <div className="text-xs text-gray-400">WPM</div>
+                <>
+                  <div className="bg-emerald-500/10 border border-emerald-500/30 rounded-xl p-5 mb-5 text-center">
+                    <h3 className="text-xl font-bold text-emerald-400 mb-3">Session Complete!</h3>
+                    <div className="grid grid-cols-3 gap-4 mb-4">
+                      <div>
+                        <div className="text-2xl font-bold text-cyan-400">{sessionResults.wpm}</div>
+                        <div className="text-xs text-gray-400">WPM</div>
+                      </div>
+                      <div>
+                        <div className="text-2xl font-bold text-emerald-400">{sessionResults.accuracy}%</div>
+                        <div className="text-xs text-gray-400">Accuracy</div>
+                      </div>
+                      <div>
+                        <div className="text-2xl font-bold text-purple-400">+{sessionResults.xpEarned}</div>
+                        <div className="text-xs text-gray-400">XP Earned</div>
+                      </div>
                     </div>
-                    <div>
-                      <div className="text-2xl font-bold text-emerald-400">{sessionResults.accuracy}%</div>
-                      <div className="text-xs text-gray-400">Accuracy</div>
-                    </div>
-                    <div>
-                      <div className="text-2xl font-bold text-purple-400">+{sessionResults.xpEarned}</div>
-                      <div className="text-xs text-gray-400">XP Earned</div>
-                    </div>
+                    {sessionResults.accuracy >= 95 && (
+                      <p className="text-sm text-emerald-400">✓ Content marked as completed! </p>
+                    )}
+                    {sessionResults.accuracy < 95 && (
+                      <p className="text-sm text-yellow-400">⚠ Need 95%+ accuracy to complete</p>
+                    )}
                   </div>
-                  {sessionResults.accuracy >= 95 && (
-                    <p className="text-sm text-emerald-400">✓ Content marked as completed! </p>
+
+                  {/* Ad after session complete */}
+                  {!userData.isPremium && (
+                    <div className="flex justify-center mb-5">
+                      <AdBanner adSlot="sessionComplete" size="300x250" />
+                    </div>
                   )}
-                  {sessionResults.accuracy < 95 && (
-                    <p className="text-sm text-yellow-400">⚠ Need 95%+ accuracy to complete</p>
-                  )}
-                </div>
+                </>
               )}
 
               {/* Action Buttons */}
@@ -1206,6 +1218,13 @@ export default function TypingMasterApp() {
           </div>
         )}
       </main>
+
+      {/* Footer Banner Ad */}
+      {!userData.isPremium && (
+        <footer className="max-w-7xl mx-auto px-4 py-6 flex justify-center">
+          <AdBanner adSlot="footerBanner" size="728x90" />
+        </footer>
+      )}
 
       {/* CSS for line-clamp */}
       <style>{`
