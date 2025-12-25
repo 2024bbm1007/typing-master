@@ -2,7 +2,7 @@
  * Generate a unique ID
  * @returns {string} Unique identifier
  */
-export const generateId = () => `${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+export const generateId = () => `${Date.now()}_${Math.random().toString(36).slice(2, 11)}`;
 
 /**
  * Format seconds to human-readable time string

@@ -14,7 +14,7 @@ export default Button;`,
     estimatedTime: 4
   },
   {
-    id:  2,
+    id: 2,
     title: "Python Function",
     category:  "Backend",
     text: `def calculate_fibonacci(n):

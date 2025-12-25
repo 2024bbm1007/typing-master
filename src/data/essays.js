@@ -14,7 +14,7 @@ export const ESSAYS = [
     estimatedTime: 5
   },
   {
-    id:  3,
+    id: 3,
     title: "The Science of Habit Formation",
     difficulty: "intermediate",
     text:  "Habits shape our daily lives more than we realize.  Research shows that approximately forty percent of our actions are driven by habit rather than conscious decision-making. Understanding how habits form empowers us to build positive routines and break negative patterns. The habit loop consists of three components: cue, routine, and reward.  Identifying triggers that prompt unwanted behaviors and replacing them with beneficial alternatives creates lasting change. Small, consistent actions compound into remarkable transformations.",
