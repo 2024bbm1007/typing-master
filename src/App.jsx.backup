@@ -1,16 +1,435 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Trophy, Target, Zap, TrendingUp, Award, Flame, Star, Clock, CheckCircle, ChevronRight, ChevronLeft, Upload, Code, FileText, BarChart3, Crown, Lock, RotateCcw, Home } from 'lucide-react';
 
-// Import data, utilities, and components
-import { ESSAYS, LESSONS, TECHNICAL_DOCS, ACHIEVEMENTS } from './data';
-import StorageService from './utils/storage';
-import { generateId, formatTime } from './utils/helpers';
-import ThemeToggle from './components/ThemeToggle';
-import Stats from './components/Stats';
-import TypingArea from './components/TypingArea';
-import Keyboard from './components/Keyboard';
-import ModeSelector from './components/ModeSelector';
+// ============================================
+// CONTENT DATA
+// ============================================
 
+const ESSAYS = [
+  {
+    id: 1,
+    title: "The Power of Persistence",
+    difficulty: "beginner",
+    text: "Success is not achieved overnight. It requires consistent effort, dedication, and the willingness to push through challenges.  Every expert was once a beginner who refused to give up.  When you face obstacles, remember that each attempt brings you closer to mastery.  The journey of improvement is filled with small victories that compound over time.  Whether learning a new skill or pursuing a goal, persistence transforms ordinary individuals into extraordinary achievers.  Embrace the process, celebrate progress, and never underestimate the power of showing up every single day.",
+    estimatedTime: 3
+  },
+  {
+    id: 2,
+    title: "Technology and Human Connection",
+    difficulty: "intermediate",
+    text: "In our increasingly digital world, technology has revolutionized how we communicate and connect.  Social media platforms enable instant communication across continents, video calls bring distant loved ones face-to-face, and collaborative tools allow teams to work seamlessly from anywhere. However, this convenience comes with challenges.  Screen time can replace meaningful in-person interactions, and digital communication sometimes lacks the depth of face-to-face conversations. The key lies in finding balance using technology to enhance rather than replace human connection.",
+    estimatedTime: 5
+  },
+  {
+    id:  3,
+    title: "The Science of Habit Formation",
+    difficulty: "intermediate",
+    text:  "Habits shape our daily lives more than we realize.  Research shows that approximately forty percent of our actions are driven by habit rather than conscious decision-making. Understanding how habits form empowers us to build positive routines and break negative patterns. The habit loop consists of three components: cue, routine, and reward.  Identifying triggers that prompt unwanted behaviors and replacing them with beneficial alternatives creates lasting change. Small, consistent actions compound into remarkable transformations.",
+    estimatedTime: 5
+  },
+  {
+    id:  4,
+    title: "Climate Change and Innovation",
+    difficulty:  "intermediate",
+    text:  "Climate change represents one of humanity's greatest challenges, but it also drives unprecedented innovation. Renewable energy technologies have advanced dramatically, with solar and wind power becoming increasingly cost-effective.  Electric vehicles are transforming transportation, while breakthrough battery technology enables better energy storage.  Scientists are developing carbon capture methods, and engineers are designing sustainable buildings that generate more energy than they consume.",
+    estimatedTime: 5
+  },
+  {
+    id:  5,
+    title: "The Art of Effective Communication",
+    difficulty: "intermediate",
+    text:  "Clear communication forms the foundation of successful relationships and professional achievement.  Effective communicators understand that listening is as important as speaking.  They pay attention to body language, tone, and context, recognizing that words convey only part of any message. Active listening involves giving full attention, asking clarifying questions, and reflecting back understanding.  When speaking, clarity and conciseness prevent misunderstandings.",
+    estimatedTime: 5
+  },
+  {
+    id:  6,
+    title: "The Future of Artificial Intelligence",
+    difficulty: "advanced",
+    text: "Artificial intelligence is reshaping every aspect of modern society, from healthcare diagnostics to creative endeavors. Machine learning algorithms analyze vast datasets to identify patterns invisible to human observation, enabling breakthroughs in drug discovery, climate modeling, and personalized medicine. Natural language processing allows machines to understand and generate human language with increasing sophistication. However, these advances raise important ethical questions about privacy, bias, and the future of work.",
+    estimatedTime: 6
+  },
+  {
+    id: 7,
+    title: "Mindfulness in Modern Life",
+    difficulty: "beginner",
+    text: "In our fast-paced world, mindfulness offers a path to peace and clarity. The practice involves paying attention to the present moment without judgment.  Simple techniques like focused breathing, body scans, and mindful observation can reduce stress and improve well-being. Research demonstrates that regular mindfulness practice changes brain structure, enhancing emotional regulation and concentration. You do not need special equipment or extensive training to begin.",
+    estimatedTime:  4
+  },
+  {
+    id:  8,
+    title: "The Global Economy",
+    difficulty: "advanced",
+    text: "The interconnected nature of today's global economy creates both opportunities and vulnerabilities. International trade enables countries to specialize in areas of comparative advantage, increasing overall efficiency and prosperity. Supply chains span continents, delivering products worldwide.  However, this interconnection means economic shocks in one region ripple globally.  Central banks coordinate policies to maintain stability, while international organizations facilitate cooperation.",
+    estimatedTime: 6
+  },
+  {
+    id: 9,
+    title: "The Importance of Sleep",
+    difficulty:  "beginner",
+    text: "Sleep is essential for physical health, mental clarity, and emotional well-being. During sleep, our bodies repair tissues, consolidate memories, and process emotions.  Chronic sleep deprivation impairs cognitive function, weakens immune systems, and increases risk for numerous health conditions. Most adults need seven to nine hours of quality sleep nightly. Creating consistent sleep schedules and limiting screen time before bed improve sleep quality.",
+    estimatedTime: 4
+  },
+  {
+    id: 10,
+    title: "Space Exploration and Discovery",
+    difficulty:  "advanced",
+    text: "Humanity's drive to explore space has led to remarkable achievements and technological breakthroughs. From the first satellite launches to Mars rovers and the International Space Station, each milestone expands our understanding of the universe.  Private companies now complement government space agencies, making space more accessible.  Reusable rockets dramatically reduce launch costs, while plans for lunar bases and Mars missions capture public imagination.",
+    estimatedTime: 6
+  },
+  {
+    id: 11,
+    title: "The Digital Revolution",
+    difficulty:  "intermediate",
+    text: "The digital revolution has fundamentally transformed how we live, work, and interact. The internet connects billions of people, creating unprecedented access to information and opportunities.  Cloud computing enables businesses of all sizes to leverage powerful technology without massive infrastructure investments. Smartphones put computing power in everyone's pocket, democratizing access to knowledge and services.",
+    estimatedTime: 5
+  },
+  {
+    id: 12,
+    title:  "Sustainable Living",
+    difficulty: "intermediate",
+    text: "Adopting sustainable practices benefits both the environment and personal well-being. Small changes accumulate into significant impact reducing single-use plastics, choosing renewable energy, supporting local businesses, and minimizing food waste.  Sustainable living is not about perfection but progress.  Growing your own vegetables, even in small containers, connects you with food sources.  Choosing durable products over disposable alternatives reduces waste.",
+    estimatedTime: 5
+  },
+  {
+    id: 13,
+    title: "The Evolution of Music",
+    difficulty:  "intermediate",
+    text: "Music has been fundamental to human culture throughout history, evolving from ancient rhythms to modern digital compositions. Each era brought innovations from classical orchestration to jazz improvisation, rock rebellion to hip-hop storytelling, and electronic experimentation.  Technology continuously transforms how we create, distribute, and consume music. Despite these changes, music's core purpose remains constant: expressing emotions and telling stories.",
+    estimatedTime: 5
+  },
+  {
+    id: 14,
+    title: "Critical Thinking Skills",
+    difficulty:  "advanced",
+    text: "Critical thinking involves analyzing information objectively, questioning assumptions, and forming reasoned judgments. In an era of information overload and misinformation, these skills are more important than ever. Effective critical thinkers evaluate sources, recognize bias, distinguish fact from opinion, and identify logical fallacies.  They consider multiple perspectives before reaching conclusions and remain open to revising beliefs when presented with compelling evidence.",
+    estimatedTime: 6
+  },
+  {
+    id:  15,
+    title: "The Benefits of Reading",
+    difficulty:  "beginner",
+    text: "Reading offers countless benefits for mind and soul. Books transport us to different worlds, expand our knowledge, and develop empathy by exploring diverse perspectives. Regular reading improves vocabulary, writing skills, and cognitive function. It reduces stress, enhances focus, and provides entertainment without screens. Whether fiction or non-fiction, each book offers unique insights and experiences.",
+    estimatedTime: 4
+  },
+  {
+    id: 16,
+    title: "Entrepreneurship and Innovation",
+    difficulty: "advanced",
+    text:  "Entrepreneurship drives economic growth and societal progress by transforming innovative ideas into valuable products and services.  Successful entrepreneurs identify problems and create solutions, often disrupting established industries. The journey requires resilience, adaptability, and willingness to learn from failure. Modern technology has lowered barriers to entry as online platforms enable global reach with minimal initial investment.",
+    estimatedTime: 6
+  },
+  {
+    id:  17,
+    title: "The Human Brain",
+    difficulty:  "advanced",
+    text:  "The human brain is the most complex structure known to science, containing approximately eighty-six billion neurons forming trillions of connections.  This remarkable organ controls everything from automatic functions like breathing to abstract thought and creativity.  Neuroscience continues uncovering how the brain processes information, forms memories, and generates consciousness.  Neuroplasticity means we can learn and adapt throughout life.",
+    estimatedTime: 6
+  },
+  {
+    id: 18,
+    title:  "Financial Literacy",
+    difficulty: "intermediate",
+    text:  "Financial literacy empowers individuals to make informed decisions about money management, investment, and long-term planning. Understanding basic concepts like budgeting, compound interest, diversification, and risk management provides foundation for financial security. Creating and maintaining a budget tracks income and expenses, revealing spending patterns and opportunities to save. Emergency funds protect against unexpected costs.",
+    estimatedTime: 5
+  },
+  {
+    id: 19,
+    title:  "The Ocean Mysteries",
+    difficulty:  "intermediate",
+    text: "Earth's oceans cover seventy percent of the planet's surface yet remain largely unexplored. These vast waters regulate climate, produce oxygen, and host incredible biodiversity. From microscopic plankton to massive whales, ocean ecosystems are complex and interconnected.  Coral reefs, often called rainforests of the sea, support thousands of species despite covering minimal ocean floor.",
+    estimatedTime: 5
+  },
+  {
+    id: 20,
+    title:  "The Power of Gratitude",
+    difficulty: "beginner",
+    text: "Practicing gratitude transforms perspective and improves well-being. Taking time to appreciate positive aspects of life, however small, shifts focus from what is lacking to what is abundant. Research shows grateful people experience better mental health, stronger relationships, and greater life satisfaction.  Simple practices like keeping gratitude journals or expressing appreciation to others cultivate this mindset.",
+    estimatedTime: 4
+  }
+];
+
+const LESSONS = [
+  { id: 1, title: "Home Row - ASDF", text: "aaa sss ddd fff aaa sss ddd fff asdf asdf asdf fdsa fdsa", difficulty: "beginner", section: "Home Row", estimatedTime: 2 },
+  { id: 2, title: "Home Row - JKL;", text: "jjj kkk lll ;;; jjj kkk lll ;;; jkl; jkl; jkl; ;lkj ;lkj", difficulty: "beginner", section: "Home Row", estimatedTime: 2 },
+  { id:  3, title:  "Home Row - Combined", text: "asdf jkl; asdf jkl; fdsa ;lkj fdsa ;lkj asdf jkl; fdsa ;lkj", difficulty: "beginner", section: "Home Row", estimatedTime: 2 },
+  { id:  4, title:  "Home Row Words", text: "sad lad dad fad ask lass fall flask dad ask a lad falls", difficulty: "beginner", section: "Home Row", estimatedTime: 3 },
+  { id: 5, title: "More Home Row", text:  "as ask asks fall falls all lass flask flask add sass", difficulty: "beginner", section: "Home Row", estimatedTime: 3 },
+  { id: 6, title: "Home Row Sentences", text: "a sad lad asks dad; dad falls; a lass asks; all lads fall", difficulty: "beginner", section: "Home Row", estimatedTime: 3 },
+  { id:  7, title:  "Speed Builder Home", text: "dad sad fad lad ask lass fall all; ask dad; fall sad flask", difficulty: "beginner", section: "Home Row", estimatedTime: 3 },
+  { id: 8, title: "Home Row Mastery", text: "a sad dad falls; ask a lad; all sad lads ask; a lass falls", difficulty: "beginner", section: "Home Row", estimatedTime: 3 },
+  { id:  9, title:  "Top Row - QWER", text: "qqq www eee rrr qqq www eee rrr qwer qwer qwer rewq rewq", difficulty: "beginner", section:  "Top Row", estimatedTime: 2 },
+  { id: 10, title: "Top Row - TYUI", text: "ttt yyy uuu iii ttt yyy uuu iii tyui tyui tyui iuyt iuyt", difficulty:  "beginner", section: "Top Row", estimatedTime: 2 },
+  { id: 11, title: "Top Row - OP", text: "ooo ppp ooo ppp opop opop tyuiop tyuiop qwertyuiop poiuytrewq", difficulty: "beginner", section:  "Top Row", estimatedTime: 2 },
+  { id: 12, title: "Top Row Words", text: "wet yet tire wire quite write poetry try ripe type your trip", difficulty: "beginner", section: "Top Row", estimatedTime: 3 },
+  { id: 13, title: "Top Row Combos", text: "were there their power tower query wrapper trooper reporter", difficulty: "beginner", section: "Top Row", estimatedTime: 3 },
+  { id: 14, title: "Mixed Home and Top", text: "read write type fast work well dear friends always ready", difficulty: "beginner", section: "Top Row", estimatedTime: 3 },
+  { id:  15, title:  "Top Row Practice", text: "quit query tower power wrapper trooper writer poetry typewriter", difficulty: "beginner", section:  "Top Row", estimatedTime: 3 },
+  { id: 16, title: "Top Row Sentences", text: "we were there today; write poetry; quite tired; easy work today", difficulty: "beginner", section: "Top Row", estimatedTime: 4 },
+  { id: 17, title: "Bottom Row - ZXCV", text:  "zzz xxx ccc vvv zzz xxx ccc vvv zxcv zxcv zxcv vcxz vcxz", difficulty:  "beginner", section: "Bottom Row", estimatedTime: 2 },
+  { id: 18, title: "Bottom Row - BNM", text: "bbb nnn mmm bbb nnn mmm bnm bnm bnm zxcvbnm mnbvcxz bnm", difficulty: "beginner", section: "Bottom Row", estimatedTime: 2 },
+  { id:  19, title:  "Bottom Row Words", text: "van ban can man zoom boom cave wave brave name come become", difficulty: "beginner", section: "Bottom Row", estimatedTime: 3 },
+  { id: 20, title: "All Letters Combined", text: "maximum cabinet objective vacant zombie clever modern combine", difficulty: "intermediate", section: "Bottom Row", estimatedTime: 3 },
+  { id:  21, title:  "Full Keyboard Words", text: "computer keyboard monitor maximize objective function example", difficulty: "intermediate", section: "Bottom Row", estimatedTime: 4 },
+  { id: 22, title: "Complex Combinations", text: "the quick brown fox jumps over the very lazy dog nearby today", difficulty: "intermediate", section: "Bottom Row", estimatedTime: 4 },
+  { id:  23, title:  "Numbers 1-5", text: "111 222 333 444 555 111 222 333 444 555 12345 12345 54321", difficulty: "intermediate", section: "Numbers", estimatedTime:  2 },
+  { id: 24, title: "Numbers 6-0", text: "666 777 888 999 000 666 777 888 999 000 67890 67890 09876", difficulty: "intermediate", section: "Numbers", estimatedTime: 2 },
+  { id: 25, title: "All Numbers", text: "1234567890 0987654321 1234567890 147 258 369 123 456 789 0", difficulty: "intermediate", section: "Numbers", estimatedTime: 3 },
+  { id: 26, title: "Numbers in Context", text: "I have 5 apples and 10 oranges for 15 people arriving today.", difficulty: "intermediate", section: "Numbers", estimatedTime: 3 },
+  { id: 27, title: "Dates and Times", text:  "January 15 2024 at 3:45 PM until December 31 2025 at noon.", difficulty: "intermediate", section: "Numbers", estimatedTime:  4 },
+  { id: 28, title: "Number Sequences", text: "Call 555-1234 or visit 100 Main Street by 9: 00 AM tomorrow.", difficulty: "intermediate", section: "Numbers", estimatedTime:  4 },
+  { id: 29, title: "Periods and Commas", text: "Hello, world.  How are you? I am fine, thank you.  Great job.", difficulty: "intermediate", section: "Punctuation", estimatedTime: 3 },
+  { id: 30, title: "Question Marks", text:  "What?  How? Why? When? Where?  Who are you?  What time is it?", difficulty: "intermediate", section: "Punctuation", estimatedTime:  3 },
+  { id: 31, title: "Exclamations", text: "Wow! Amazing! Fantastic! Great job!  Well done!  Awesome work!", difficulty: "intermediate", section: "Punctuation", estimatedTime: 3 },
+  { id: 32, title: "Apostrophes", text:  "don't can't won't shouldn't wouldn't couldn't isn't aren't", difficulty: "intermediate", section: "Punctuation", estimatedTime: 3 },
+  { id: 33, title: "Quotation Marks", text: "She said Hello and I replied Hi there with a smile today.", difficulty: "intermediate", section: "Punctuation", estimatedTime: 4 },
+  { id: 34, title: "Mixed Punctuation", text: "Hello!  How are you? I'm fine, thanks. That's great news today!", difficulty: "intermediate", section: "Punctuation", estimatedTime: 4 },
+  { id: 35, title: "Symbols Basic", text: "### @@@ $$$ user@email.com $50 $100 #hashtag @mention today", difficulty: "intermediate", section: "Special Chars", estimatedTime:  3 },
+  { id: 36, title: "More Symbols", text: "50% 100% *asterisk* &and (parentheses) [brackets] {braces}", difficulty: "intermediate", section: "Special Chars", estimatedTime: 3 },
+  { id:  37, title:  "Programming Chars", text: "int x = 10; if (x > 5) { return true; } else { return false; }", difficulty: "advanced", section: "Special Chars", estimatedTime: 4 },
+  { id: 38, title: "Email Format", text: "john. doe@example.com jane_smith123@website.org contact@test.io", difficulty: "intermediate", section: "Special Chars", estimatedTime: 3 },
+  { id: 39, title: "URLs and Paths", text: "https://www.example.com/path/to/page. html? id=123&name=test", difficulty: "advanced", section: "Special Chars", estimatedTime: 4 },
+  { id: 40, title: "Math Expressions", text: "x + y = z; a * b = c; (x + y) / 2 = average; x^2 + 1 = result", difficulty: "advanced", section: "Special Chars", estimatedTime: 4 },
+  { id: 41, title: "Common Words Speed", text: "the and for you not with this that but have from they we are", difficulty: "intermediate", section: "Speed", estimatedTime: 3 },
+  { id: 42, title: "Speed Drill 1", text: "Practice makes perfect when you focus on consistent daily improvement.", difficulty: "intermediate", section: "Speed", estimatedTime:  4 },
+  { id: 43, title: "Speed Drill 2", text: "Quick typing requires proper finger placement and regular practice sessions.", difficulty: "intermediate", section: "Speed", estimatedTime:  4 },
+  { id: 44, title: "Speed Drill 3", text: "The development of muscle memory comes from repetition and focused attention.", difficulty: "advanced", section: "Speed", estimatedTime:  5 },
+  { id: 45, title: "Speed Challenge", text: "Advanced typists maintain accuracy while increasing speed through deliberate practice.", difficulty: "advanced", section:  "Speed", estimatedTime: 5 },
+  { id: 46, title: "Speed Mastery", text: "Achieving mastery requires dedication, consistency, patience, and willingness to learn.", difficulty: "advanced", section: "Speed", estimatedTime: 6 },
+  { id: 47, title: "Complex Sentences", text:  "Although the weather was unpredictable, we decided to continue with our plans.", difficulty: "advanced", section:  "Advanced", estimatedTime:  5 },
+  { id: 48, title: "Technical Writing", text: "The implementation of distributed systems requires understanding consensus algorithms.", difficulty: "advanced", section: "Advanced", estimatedTime: 6 },
+  { id: 49, title: "Business Communication", text: "Please review the quarterly financial report and provide feedback regarding budget.", difficulty: "advanced", section: "Advanced", estimatedTime: 6 },
+  { id: 50, title: "Academic Style", text: "Contemporary research demonstrates that cognitive performance improves with exercise.", difficulty: "advanced", section: "Advanced", estimatedTime:  6 },
+  { id: 51, title: "Creative Writing", text: "The crimson sunset painted the horizon with spectacular hues while waves whispered.", difficulty: "advanced", section: "Advanced", estimatedTime: 6 },
+  { id: 52, title: "Code Comments", text: "// Initialize variables and configure settings for the application to run properly", difficulty: "advanced", section: "Advanced", estimatedTime: 5 },
+  { id: 53, title: "Mixed Content", text: "Schedule the meeting for 3: 30 PM on Friday.  Contact sarah@company.com for details.", difficulty: "advanced", section: "Advanced", estimatedTime:  6 },
+  { id: 54, title: "Long Form Practice", text: "Mastering touch typing is a valuable skill that enhances productivity across all tasks.", difficulty: "advanced", section: "Advanced", estimatedTime:  7 },
+  { id: 55, title: "Ultimate Challenge", text: "The intersection of technology, creativity, and human ingenuity drives innovation forward.", difficulty: "advanced", section: "Advanced", estimatedTime:  8 }
+];
+
+const TECHNICAL_DOCS = [
+  {
+    id: 1,
+    title: "React Component",
+    category: "Frontend",
+    text: `const Button = ({ onClick, children, variant }) => {
+  return (
+    <button onClick={onClick} className={variant}>
+      {children}
+    </button>
+  );
+};
+export default Button;`,
+    estimatedTime: 4
+  },
+  {
+    id:  2,
+    title: "Python Function",
+    category:  "Backend",
+    text: `def calculate_fibonacci(n):
+    if n <= 0:
+        return []
+    elif n == 1:
+        return [0]
+    fib = [0, 1]
+    for i in range(2, n):
+        fib.append(fib[i-1] + fib[i-2])
+    return fib`,
+    estimatedTime: 5
+  },
+  {
+    id:  3,
+    title: "REST API Endpoint",
+    category: "API",
+    text:  `POST /api/v1/users/authenticate
+Content-Type: application/json
+{
+  "email": "user@example.com",
+  "password": "securePassword123"
+}
+Response: { "token": "jwt_token_here" }`,
+    estimatedTime: 5
+  },
+  {
+    id:  4,
+    title: "SQL Query",
+    category: "Database",
+    text: `SELECT u.user_id, u.username,
+       COUNT(o.order_id) as total_orders
+FROM users u
+LEFT JOIN orders o ON u.user_id = o.user_id
+WHERE u.status = 'active'
+GROUP BY u.user_id
+ORDER BY total_orders DESC;`,
+    estimatedTime: 5
+  },
+  {
+    id:  5,
+    title: "Docker Configuration",
+    category:  "DevOps",
+    text: `FROM node:18-alpine
+WORKDIR /app
+COPY package*.json ./
+RUN npm ci --only=production
+COPY . .
+ENV NODE_ENV=production
+EXPOSE 3000
+CMD ["node", "server.js"]`,
+    estimatedTime: 4
+  },
+  {
+    id:  6,
+    title: "Git Commands",
+    category:  "Version Control",
+    text: `git clone https://github.com/user/repo.git
+git checkout -b feature/new-feature
+git add . 
+git commit -m "Add new feature"
+git push origin feature/new-feature
+git merge main`,
+    estimatedTime: 5
+  },
+  {
+    id: 7,
+    title: "TypeScript Interface",
+    category: "Frontend",
+    text: `interface User {
+  id: string;
+  username:  string;
+  email: string;
+  profile: {
+    firstName: string;
+    lastName: string;
+  };
+  createdAt: Date;
+}
+type UserRole = 'admin' | 'user';`,
+    estimatedTime: 5
+  },
+  {
+    id:  8,
+    title: "AWS Lambda Function",
+    category: "Cloud",
+    text:  `exports.handler = async (event) => {
+  const { httpMethod, body } = event;
+  if (httpMethod !== 'POST') {
+    return { statusCode: 405 };
+  }
+  const data = JSON.parse(body);
+  return { statusCode: 200, body: JSON.stringify(data) };
+};`,
+    estimatedTime: 6
+  }
+];
+
+const ACHIEVEMENTS = [
+  { id: 'speed_30', name: 'Speed Starter', desc: 'Reach 30 WPM', icon: '🚀', requirement: { type: 'wpm', value: 30 } },
+  { id: 'speed_50', name: 'Speed Builder', desc: 'Reach 50 WPM', icon: '⚡', requirement: { type: 'wpm', value: 50 } },
+  { id: 'speed_60', name: 'Speed Racer', desc: 'Reach 60 WPM', icon: '🏎️', requirement: { type: 'wpm', value: 60 } },
+  { id: 'speed_80', name: 'Fast Typer', desc: 'Reach 80 WPM', icon: '🔥', requirement: { type: 'wpm', value: 80 } },
+  { id: 'speed_100', name: 'Lightning Fingers', desc: 'Reach 100 WPM', icon: '⚡⚡', requirement:  { type: 'wpm', value:  100 } },
+  { id: 'speed_120', name: 'Speed Demon', desc: 'Reach 120 WPM', icon: '👹', requirement: { type: 'wpm', value: 120 } },
+  { id: 'perfect', name: 'Perfect Typist', desc: '100% accuracy', icon: '💯', requirement: { type: 'accuracy', value: 100 } },
+  { id: 'accurate_95', name: 'Nearly Perfect', desc: '95%+ accuracy 10 times', icon: '🎯', requirement:  { type: 'accuracy_streak', value: 10 } },
+  { id: 'streak_7', name: 'Weekly Warrior', desc: '7 day streak', icon: '🔥', requirement: { type: 'streak', value:  7 } },
+  { id: 'streak_30', name: 'Monthly Master', desc: '30 day streak', icon: '🔥🔥', requirement:  { type: 'streak', value: 30 } },
+  { id: 'sessions_10', name: 'Getting Started', desc: '10 sessions', icon: '📝', requirement: { type: 'sessions', value: 10 } },
+  { id: 'sessions_50', name: 'Regular Practitioner', desc: '50 sessions', icon: '📚', requirement: { type: 'sessions', value: 50 } },
+  { id: 'sessions_100', name: 'Dedicated', desc: '100 sessions', icon: '🏆', requirement: { type: 'sessions', value: 100 } },
+  { id: 'lessons_10', name: 'Quick Learner', desc: 'Complete 10 lessons', icon: '🎓', requirement: { type: 'lessons', value: 10 } },
+  { id: 'lessons_all', name: 'Lesson Master', desc: 'Complete all lessons', icon: '🏅', requirement: { type: 'lessons', value: 55 } },
+  { id: 'essays_5', name: 'Essay Novice', desc: 'Complete 5 essays', icon: '✍️', requirement:  { type: 'essays', value: 5 } },
+  { id: 'essays_all', name: 'Essay Master', desc: 'Complete all essays', icon: '📜', requirement: { type: 'essays', value: 20 } },
+  { id: 'time_1hr', name: 'One Hour', desc: 'Practice for 1 hour', icon: '⏱️', requirement: { type: 'time', value:  3600 } },
+  { id: 'time_5hr', name: 'Five Hours', desc: 'Practice for 5 hours', icon: '⏱️⏱️', requirement: { type: 'time', value:  18000 } },
+  { id: 'premium', name: 'Premium Member', desc: 'Unlock premium', icon: '👑', requirement: { type: 'premium', value: true } },
+  { id: 'tech_master', name: 'Code Typer', desc: 'Complete all tech docs', icon: '💻', requirement: { type: 'docs', value: 8 } }
+];
+
+// ============================================
+// STORAGE SERVICE
+// ============================================
+
+const StorageService = {
+  KEYS: {
+    USER_DATA: 'typingmaster_user_data',
+    ACTIVE_SESSION: 'typingmaster_active_session'
+  },
+
+  get(key) {
+    try {
+      const item = localStorage.getItem(key);
+      return item ? JSON.parse(item) : null;
+    } catch (e) {
+      console.error('Storage get error:', e);
+      return null;
+    }
+  },
+
+  set(key, value) {
+    try {
+      localStorage.setItem(key, JSON.stringify(value));
+      return true;
+    } catch (e) {
+      console.error('Storage set error:', e);
+      return false;
+    }
+  },
+
+  remove(key) {
+    localStorage.removeItem(key);
+  },
+
+  getUserData() {
+    return this.get(this.KEYS.USER_DATA) || this.getDefaultUserData();
+  },
+
+  setUserData(data) {
+    return this.set(this.KEYS.USER_DATA, data);
+  },
+
+  getDefaultUserData() {
+    return {
+      isPremium: false,
+      premiumUntil: null,
+      bestWpm: 0,
+      averageWpm: 0,
+      averageAccuracy: 0,
+      totalSessions: 0,
+      totalTime: 0,
+      currentStreak: 0,
+      longestStreak: 0,
+      lastPracticeDate: null,
+      achievements: [],
+      lessonsCompleted: [],
+      essaysCompleted: [],
+      docsCompleted: [],
+      sessionHistory: [],
+      keyErrors: {},
+      wpmHistory: [],
+      accuracyHistory: [],
+      accuracyStreak: 0,
+      xp: 0,
+      level: 1
+    };
+  },
+
+  clearActiveSession() {
+    return this.remove(this.KEYS.ACTIVE_SESSION);
+  }
+};
+
+// ============================================
+// UTILITY FUNCTIONS
+// ============================================
+
+const generateId = () => `${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+
+const formatTime = (seconds) => {
+  const hrs = Math.floor(seconds / 3600);
+  const mins = Math.floor((seconds % 3600) / 60);
+  if (hrs > 0) return `${hrs}h ${mins}m`;
+  return `${mins}m`;
+};
 
 // ============================================
 // MAIN APPLICATION
@@ -596,7 +1015,6 @@ export default function TypingMasterApp() {
                 <Star className="w-4 h-4 text-purple-400" />
                 <span className="font-semibold text-purple-400 text-sm">Lv. {userData.level}</span>
               </div>
-              <ThemeToggle />
             </div>
           </div>
           

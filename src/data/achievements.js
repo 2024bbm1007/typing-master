@@ -1,0 +1,23 @@
+export const ACHIEVEMENTS = [
+  { id: 'speed_30', name: 'Speed Starter', desc: 'Reach 30 WPM', icon: '🚀', requirement: { type: 'wpm', value: 30 } },
+  { id: 'speed_50', name: 'Speed Builder', desc: 'Reach 50 WPM', icon: '⚡', requirement: { type: 'wpm', value: 50 } },
+  { id: 'speed_60', name: 'Speed Racer', desc: 'Reach 60 WPM', icon: '🏎️', requirement: { type: 'wpm', value: 60 } },
+  { id: 'speed_80', name: 'Fast Typer', desc: 'Reach 80 WPM', icon: '🔥', requirement: { type: 'wpm', value: 80 } },
+  { id: 'speed_100', name: 'Lightning Fingers', desc: 'Reach 100 WPM', icon: '⚡⚡', requirement:  { type: 'wpm', value:  100 } },
+  { id: 'speed_120', name: 'Speed Demon', desc: 'Reach 120 WPM', icon: '👹', requirement: { type: 'wpm', value: 120 } },
+  { id: 'perfect', name: 'Perfect Typist', desc: '100% accuracy', icon: '💯', requirement: { type: 'accuracy', value: 100 } },
+  { id: 'accurate_95', name: 'Nearly Perfect', desc: '95%+ accuracy 10 times', icon: '🎯', requirement:  { type: 'accuracy_streak', value: 10 } },
+  { id: 'streak_7', name: 'Weekly Warrior', desc: '7 day streak', icon: '🔥', requirement: { type: 'streak', value:  7 } },
+  { id: 'streak_30', name: 'Monthly Master', desc: '30 day streak', icon: '🔥🔥', requirement:  { type: 'streak', value: 30 } },
+  { id: 'sessions_10', name: 'Getting Started', desc: '10 sessions', icon: '📝', requirement: { type: 'sessions', value: 10 } },
+  { id: 'sessions_50', name: 'Regular Practitioner', desc: '50 sessions', icon: '📚', requirement: { type: 'sessions', value: 50 } },
+  { id: 'sessions_100', name: 'Dedicated', desc: '100 sessions', icon: '🏆', requirement: { type: 'sessions', value: 100 } },
+  { id: 'lessons_10', name: 'Quick Learner', desc: 'Complete 10 lessons', icon: '🎓', requirement: { type: 'lessons', value: 10 } },
+  { id: 'lessons_all', name: 'Lesson Master', desc: 'Complete all lessons', icon: '🏅', requirement: { type: 'lessons', value: 55 } },
+  { id: 'essays_5', name: 'Essay Novice', desc: 'Complete 5 essays', icon: '✍️', requirement:  { type: 'essays', value: 5 } },
+  { id: 'essays_all', name: 'Essay Master', desc: 'Complete all essays', icon: '📜', requirement: { type: 'essays', value: 20 } },
+  { id: 'time_1hr', name: 'One Hour', desc: 'Practice for 1 hour', icon: '⏱️', requirement: { type: 'time', value:  3600 } },
+  { id: 'time_5hr', name: 'Five Hours', desc: 'Practice for 5 hours', icon: '⏱️⏱️', requirement: { type: 'time', value:  18000 } },
+  { id: 'premium', name: 'Premium Member', desc: 'Unlock premium', icon: '👑', requirement: { type: 'premium', value: true } },
+  { id: 'tech_master', name: 'Code Typer', desc: 'Complete all tech docs', icon: '💻', requirement: { type: 'docs', value: 8 } }
+];
