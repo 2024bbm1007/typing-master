@@ -1,5 +1,5 @@
 export const LESSONS = [
-  { id: 1, title: "Home Row - ASDF", text: "baa sss ddd fff aaa sss ddd fff asdf asdf asdf fdsa fdsa", difficulty: "beginner", section: "Home Row", estimatedTime: 2 },
+  { id: 1, title: "Home Row - ASDF", text: "aaa sss ddd fff aaa sss ddd fff asdf asdf asdf fdsa fdsa", difficulty: "beginner", section: "Home Row", estimatedTime: 2 },
   { id: 2, title: "Home Row - JKL;", text: "jjj kkk lll ;;; jjj kkk lll ;;; jkl; jkl; jkl; ;lkj ;lkj", difficulty: "beginner", section: "Home Row", estimatedTime: 2 },
   { id:  3, title:  "Home Row - Combined", text: "asdf jkl; asdf jkl; fdsa ;lkj fdsa ;lkj asdf jkl; fdsa ;lkj", difficulty: "beginner", section: "Home Row", estimatedTime: 2 },
   { id:  4, title:  "Home Row Words", text: "sad lad dad fad ask lass fall flask dad ask a lad falls", difficulty: "beginner", section: "Home Row", estimatedTime: 3 },
