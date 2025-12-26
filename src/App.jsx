@@ -3,16 +3,17 @@ import { Trophy, Target, Zap, TrendingUp, Award, Flame, Star, Clock, CheckCircle
 
 // Import data, utilities, and components
 import { ESSAYS, LESSONS, TECHNICAL_DOCS, ACHIEVEMENTS } from './data';
-import StorageService from './utils/storage';
-import { generateId, formatTime } from './utils/helpers';
+import { formatTime, StorageService, generateId } from './utils/helpers';
 import ThemeToggle from './components/ThemeToggle';
 import Stats from './components/Stats';
 import TypingArea from './components/TypingArea';
 import Keyboard from './components/Keyboard';
 import ModeSelector from './components/ModeSelector';
 
+
 // Import Ad and Payment components
 import { AdBanner, AdInterstitial, FeatureGate } from './components/Ads';
+import { useTyping } from './context/TypingContext';
 import { PaymentModal } from './components/Payment';
 import AdService from './services/adService';
 import AdUnlockService from './services/adUnlockService';
@@ -24,298 +25,61 @@ import AdUnlockService from './services/adUnlockService';
 
 export default function TypingMasterApp() {
   const [mode, setMode] = useState('home');
-  const [userData, setUserData] = useState(StorageService.getDefaultUserData());
   const [showPaymentModal, setShowPaymentModal] = useState(false);
   const [showCustomTextModal, setShowCustomTextModal] = useState(false);
-  const [notification, setNotification] = useState(null);
   const [showInterstitial, setShowInterstitial] = useState(false);
-  
-  const [practiceText, setPracticeText] = useState('');
-  const [userInput, setUserInput] = useState('');
-  const [isTyping, setIsTyping] = useState(false);
-  const [startTime, setStartTime] = useState(null);
-  const [wpm, setWpm] = useState(0);
-  const [accuracy, setAccuracy] = useState(100);
-  const [errors, setErrors] = useState([]);
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [currentLesson, setCurrentLesson] = useState(null);
-  const [currentEssay, setCurrentEssay] = useState(null);
-  const [currentDoc, setCurrentDoc] = useState(null);
   const [customText, setCustomText] = useState('');
   const [selectedSection, setSelectedSection] = useState('all');
-  const [sessionComplete, setSessionComplete] = useState(false);
-  const [sessionResults, setSessionResults] = useState(null);
-
-  const inputRef = useRef(null);
-
-  useEffect(() => {
-    const data = StorageService. getUserData();
-    setUserData(data);
-    checkStreak(data);
-  }, []);
-
-  useEffect(() => {
-    StorageService.setUserData(userData);
-  }, [userData]);
-
-  useEffect(() => {
-    if (isTyping && startTime) {
-      const interval = setInterval(() => {
-        const elapsed = (Date.now() - startTime) / 1000 / 60;
-        if (elapsed > 0 && userInput.length > 0) {
-          const calculatedWpm = Math.round((userInput.length / 5) / elapsed) || 0;
-          setWpm(calculatedWpm);
-        }
-      }, 100);
-      return () => clearInterval(interval);
-    }
-  }, [isTyping, startTime, userInput]);
-
-  const checkStreak = (data) => {
-    if (!data.lastPracticeDate) return;
-    const today = new Date().toDateString();
-    const lastDate = new Date(data.lastPracticeDate).toDateString();
-    const yesterday = new Date(Date.now() - 86400000).toDateString();
+// Connect to global TypingContext
+  const {
+    // State
+    userData,
+    practiceText,
+    userInput,
+    isTyping,
+    wpm,
+    accuracy,
+    errors,
+    currentIndex,
+    currentLesson,
+    currentEssay,
+    currentDoc,
+    sessionComplete,
+    sessionResults,
+    notification,
     
-    if (lastDate !== today && lastDate !== yesterday) {
-      setUserData(prev => ({ ...prev, currentStreak: 0 }));
-    }
-  };
+    // Actions
+    startSession: startContextSession,
+    handleTyping,
+    isLessonUnlocked,
+    handlePayment,
+    showNotificationMsg,
+    
+    // Refs
+    inputRef
+  } = useTyping();
 
-  const showNotificationMsg = (message, type = 'success') => {
-    setNotification({ message, type });
-    setTimeout(() => setNotification(null), 3000);
-  };
+  
 
   const startSession = useCallback((text, lesson = null, essay = null, doc = null) => {
-    setPracticeText(text);
-    setUserInput('');
-    setCurrentIndex(0);
-    setErrors([]);
-    setIsTyping(false);
-    setStartTime(null);
-    setWpm(0);
-    setAccuracy(100);
-    setCurrentLesson(lesson);
-    setCurrentEssay(essay);
-    setCurrentDoc(doc);
-    setSessionComplete(false);
-    setSessionResults(null);
+    startContextSession(text, lesson, essay, doc);
     setMode('typing');
-    
+  }, [startContextSession]);
+
+  useEffect(() => {
     setTimeout(() => inputRef.current?.focus(), 100);
-  }, []);
+  }, [inputRef]);
 
-  const handleTyping = useCallback((e) => {
-    const value = e.target.value;
-    
-    if (!isTyping && value.length > 0) {
-      setIsTyping(true);
-      setStartTime(Date.now());
-    }
+  
+   
 
-    setUserInput(value);
-    
-    const newErrors = [];
-    let correct = 0;
-    
-    for (let i = 0; i < value.length && i < practiceText.length; i++) {
-      if (value[i] === practiceText[i]) {
-        correct++;
-      } else {
-        newErrors.push(i);
-      }
-    }
-    
-    setErrors(newErrors);
-    setCurrentIndex(value.length);
-    
-    const acc = value.length > 0 ? Math.round((correct / value.length) * 100) : 100;
-    setAccuracy(acc);
+ 
 
-    if (value.length >= practiceText.length) {
-      completeSession(wpm, acc, newErrors);
-    }
-  }, [isTyping, practiceText, wpm]);
+  
 
-  const completeSession = useCallback((finalWpm, finalAccuracy, finalErrors) => {
-    if (sessionComplete) return;
-    setSessionComplete(true);
-    setIsTyping(false);
-    
-    const duration = startTime ? (Date.now() - startTime) / 1000 : 0;
-    const today = new Date().toDateString();
-    
-    const keyErrorsUpdate = { ...userData.keyErrors };
-    finalErrors.forEach(idx => {
-      if (idx < practiceText.length) {
-        const expectedKey = practiceText[idx];
-        keyErrorsUpdate[expectedKey] = (keyErrorsUpdate[expectedKey] || 0) + 1;
-      }
-    });
-    
-    const xpEarned = Math.floor(10 + (finalWpm / 10) + finalAccuracy);
-    
-    let newStreak = userData.currentStreak;
-    if (userData.lastPracticeDate) {
-      const lastDate = new Date(userData.lastPracticeDate).toDateString();
-      const yesterday = new Date(Date.now() - 86400000).toDateString();
-      if (lastDate === yesterday) {
-        newStreak = userData.currentStreak + 1;
-      } else if (lastDate !== today) {
-        newStreak = 1;
-      }
-    } else {
-      newStreak = 1;
-    }
+  
 
-    const newAccuracyStreak = finalAccuracy >= 95 ? userData.accuracyStreak + 1 : 0;
-
-    const sessionRecord = {
-      id: generateId(),
-      date: Date.now(),
-      wpm: finalWpm,
-      accuracy:  finalAccuracy,
-      duration,
-      type: currentLesson ? 'lesson' : currentEssay ? 'essay' : currentDoc ? 'doc' : 'custom'
-    };
-
-    const updatedData = {
-      ...userData,
-      bestWpm: Math.max(userData.bestWpm, finalWpm),
-      averageWpm:  userData.totalSessions > 0 
-        ? Math.round((userData.averageWpm * userData.totalSessions + finalWpm) / (userData.totalSessions + 1))
-        : finalWpm,
-      averageAccuracy: userData.totalSessions > 0
-        ?  Math.round((userData.averageAccuracy * userData.totalSessions + finalAccuracy) / (userData.totalSessions + 1))
-        : finalAccuracy,
-      totalSessions:  userData.totalSessions + 1,
-      totalTime: userData.totalTime + Math.round(duration),
-      currentStreak: newStreak,
-      longestStreak: Math.max(userData.longestStreak, newStreak),
-      lastPracticeDate: Date.now(),
-      sessionHistory: [...userData.sessionHistory, sessionRecord]. slice(-500),
-      keyErrors: keyErrorsUpdate,
-      wpmHistory: [...userData.wpmHistory, { date: Date.now(), wpm: finalWpm }].slice(-100),
-      accuracyHistory: [...userData.accuracyHistory, { date: Date.now(), accuracy: finalAccuracy }]. slice(-100),
-      accuracyStreak:  newAccuracyStreak,
-      xp: userData.xp + xpEarned,
-      level: calculateLevel(userData.xp + xpEarned)
-    };
-
-    if (finalAccuracy >= 95) {
-      if (currentLesson && !userData.lessonsCompleted.includes(currentLesson.id)) {
-        updatedData.lessonsCompleted = [...userData.lessonsCompleted, currentLesson.id];
-      }
-      if (currentEssay && !userData.essaysCompleted.includes(currentEssay.id)) {
-        updatedData.essaysCompleted = [...userData.essaysCompleted, currentEssay.id];
-      }
-      if (currentDoc && !userData.docsCompleted.includes(currentDoc.id)) {
-        updatedData.docsCompleted = [...userData.docsCompleted, currentDoc.id];
-      }
-    }
-
-    const newAchievements = checkAchievements(updatedData);
-    const brandNewAchievements = newAchievements. filter(a => !userData.achievements.includes(a));
-    updatedData.achievements = [...new Set([...userData.achievements, ...newAchievements])];
-
-    setUserData(updatedData);
-    setSessionResults({
-      wpm:  finalWpm,
-      accuracy: finalAccuracy,
-      duration,
-      xpEarned,
-      newAchievements: brandNewAchievements
-    });
-
-    if (brandNewAchievements.length > 0) {
-      const ach = ACHIEVEMENTS.find(a => a.id === brandNewAchievements[0]);
-      if (ach) {
-        showNotificationMsg(`🎉 Achievement unlocked:  ${ach.name}`);
-      }
-    }
-
-    // Check if interstitial ad should be shown
-    if (AdService.shouldShowInterstitial(updatedData.totalSessions, updatedData.isPremium)) {
-      setTimeout(() => setShowInterstitial(true), 1000);
-    }
-  }, [sessionComplete, startTime, userData, currentLesson, currentEssay, currentDoc, practiceText]);
-
-  const calculateLevel = (xp) => {
-    let level = 1;
-    let xpRequired = 100;
-    let totalXpRequired = 0;
-    
-    while (xp >= totalXpRequired + xpRequired) {
-      totalXpRequired += xpRequired;
-      level++;
-      xpRequired = level * 100;
-    }
-    
-    return level;
-  };
-
-  const checkAchievements = (data) => {
-    const unlocked = [];
-    
-    ACHIEVEMENTS.forEach(ach => {
-      if (data.achievements.includes(ach.id)) return;
-      
-      const { type, value } = ach.requirement;
-      
-      switch (type) {
-        case 'wpm':
-          if (data.bestWpm >= value) unlocked.push(ach.id);
-          break;
-        case 'accuracy': 
-          if (data.sessionHistory.some(s => s.accuracy >= value)) unlocked.push(ach.id);
-          break;
-        case 'accuracy_streak':
-          if (data.accuracyStreak >= value) unlocked.push(ach.id);
-          break;
-        case 'streak':
-          if (data.currentStreak >= value) unlocked.push(ach.id);
-          break;
-        case 'sessions': 
-          if (data.totalSessions >= value) unlocked.push(ach.id);
-          break;
-        case 'lessons':
-          if (data.lessonsCompleted.length >= value) unlocked.push(ach.id);
-          break;
-        case 'essays': 
-          if (data. essaysCompleted.length >= value) unlocked.push(ach.id);
-          break;
-        case 'docs': 
-          if (data.docsCompleted.length >= value) unlocked.push(ach.id);
-          break;
-        case 'time':
-          if (data.totalTime >= value) unlocked.push(ach.id);
-          break;
-        case 'premium':
-          if (data.isPremium) unlocked.push(ach.id);
-          break;
-        default:
-          break;
-      }
-    });
-    
-    return unlocked;
-  };
-
-  const handlePayment = () => {
-    const premiumUntil = new Date();
-    premiumUntil.setFullYear(premiumUntil.getFullYear() + 1);
-    
-    setUserData(prev => ({
-      ...prev,
-      isPremium: true,
-      premiumUntil: premiumUntil.toISOString(),
-      achievements: [... new Set([...prev.achievements, 'premium'])]
-    }));
-    
-    setShowPaymentModal(false);
-    showNotificationMsg('🎉 Premium activated! Enjoy all analytics features.');
-  };
+  
 
   const handleCustomTextSubmit = () => {
     if (customText.trim().length < 20) {
@@ -327,13 +91,7 @@ export default function TypingMasterApp() {
     setCustomText('');
   };
 
-  const isLessonUnlocked = (lesson) => {
-    if (lesson.id === 1) return true;
-    // Check if previous lesson is completed OR if user has ad-unlocked this lesson
-    const prevCompleted = userData.lessonsCompleted.includes(lesson.id - 1);
-    const adUnlocked = AdUnlockService.isFeatureAccessible('unlockNextLesson', userData.isPremium);
-    return prevCompleted || adUnlocked;
-  };
+  
 
   const renderChar = (char, index) => {
     let className = 'inline transition-all duration-75';

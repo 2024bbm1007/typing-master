@@ -138,5 +138,40 @@ export const ESSAYS = [
     difficulty:  "intermediate",
     text: "Resilience is the ability to bounce back from adversity, and it can be developed. Resilient people view challenges as opportunities for growth rather than insurmountable obstacles. They maintain perspective during difficulties, recognizing that setbacks are temporary. Strong social connections provide support during tough times. Self-care, including exercise, sleep, and hobbies, maintains the energy needed to persevere.",
     estimatedTime: 5
+  },
+  {
+    id: 21,
+    title: "Entrepreneurship and Innovation",
+    difficulty: "advanced",
+    text:  "Entrepreneurship drives economic growth and societal progress by transforming innovative ideas into valuable products and services.  Successful entrepreneurs identify problems and create solutions, often disrupting established industries. The journey requires resilience, adaptability, and willingness to learn from failure. Modern technology has lowered barriers to entry as online platforms enable global reach with minimal initial investment.",
+    estimatedTime: 6
+  },
+  {
+    id:  22,
+    title: "The Human Brain",
+    difficulty:  "advanced",
+    text:  "The human brain is the most complex structure known to science, containing approximately eighty-six billion neurons forming trillions of connections.  This remarkable organ controls everything from automatic functions like breathing to abstract thought and creativity.  Neuroscience continues uncovering how the brain processes information, forms memories, and generates consciousness.  Neuroplasticity means we can learn and adapt throughout life.",
+    estimatedTime: 6
+  },
+  {
+    id: 23,
+    title:  "Financial Literacy",
+    difficulty: "intermediate",
+    text:  "Financial literacy empowers individuals to make informed decisions about money management, investment, and long-term planning. Understanding basic concepts like budgeting, compound interest, diversification, and risk management provides foundation for financial security. Creating and maintaining a budget tracks income and expenses, revealing spending patterns and opportunities to save. Emergency funds protect against unexpected costs.",
+    estimatedTime: 5
+  },
+  {
+    id: 24,
+    title:  "The Ocean Mysteries",
+    difficulty:  "intermediate",
+    text: "Earth's oceans cover seventy percent of the planet's surface yet remain largely unexplored. These vast waters regulate climate, produce oxygen, and host incredible biodiversity. From microscopic plankton to massive whales, ocean ecosystems are complex and interconnected.  Coral reefs, often called rainforests of the sea, support thousands of species despite covering minimal ocean floor.",
+    estimatedTime: 5
+  },
+  {
+    id: 25,
+    title:  "The Power of Gratitude",
+    difficulty: "beginner",
+    text: "Practicing gratitude transforms perspective and improves well-being. Taking time to appreciate positive aspects of life, however small, shifts focus from what is lacking to what is abundant. Research shows grateful people experience better mental health, stronger relationships, and greater life satisfaction.  Simple practices like keeping gratitude journals or expressing appreciation to others cultivate this mindset.",
+    estimatedTime: 4
   }
 ];
