@@ -28,7 +28,7 @@ A comprehensive, production-ready touch typing application built with React, Vit
 - **Daily Streak Tracking** - Build consistent practice habits
 - **Progressive Lesson Unlocking** - Complete lessons with 95%+ accuracy to unlock the next
 
-### 💎 Premium Features (₹19 Lifetime)
+### 💎 Advanced Features (Ad-Supported)
 - Detailed performance graphs
 - Weak key identification
 - Speed vs accuracy analysis
@@ -86,6 +86,7 @@ The application will open at `http://localhost:5173`
 - `npm run dev` - Start development server with hot reload
 - `npm run build` - Build for production (outputs to `dist/`)
 - `npm run preview` - Preview production build locally
+- `npm run test` - Run unit tests with Vitest
 
 ## 📱 Usage Guide
 
@@ -146,8 +147,13 @@ typing-master/
 ├── README.md               # This file
 ├── src/
 │   ├── main.jsx           # Application entry point
-│   ├── App.jsx            # Main TypeMaster Pro component
-│   └── index.css          # Global styles and Tailwind imports
+│   ├── App.jsx            # Main App shell and routing
+│   ├── pages/             # Page components (Home, Lessons, TypingPage, etc.)
+│   ├── components/        # Reusable UI components
+│   ├── context/           # Global state (User, Typing, Theme)
+│   ├── utils/             # Helper functions and storage
+│   ├── test/              # Unit tests
+│   └── index.css          # Global styles
 └── public/                 # Static assets (if any)
 ```
 

@@ -50,7 +50,7 @@ export const TypingProvider = ({ children }) => {
           const calculatedWpm = calculateWPM(userInputLengthRef.current, elapsed);
           setWpm(calculatedWpm);
         }
-      }, 100);
+      }, 500); // Throttled to 500ms for better performance
       return () => clearInterval(interval);
     }
   }, [isTyping, startTime]);

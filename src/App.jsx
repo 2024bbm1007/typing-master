@@ -17,6 +17,7 @@ import CustomPractice from './pages/CustomPractice';
 import Analytics from './pages/Analytics';
 import Progress from './pages/Progress';
 import TypingPage from './pages/TypingPage';
+import PrivacyPolicy from './pages/PrivacyPolicy';
 
 export default function TypingMasterApp() {
   const navigate = useNavigate();
@@ -31,7 +32,7 @@ export default function TypingMasterApp() {
   // Derive mode from URL path
   const mode = useMemo(() => {
     const path = location.pathname.substring(1); // Remove leading '/'
-    const validModes = ['home', 'lessons', 'essays', 'technical', 'custom', 'analytics', 'progress', 'typing'];
+    const validModes = ['home', 'lessons', 'essays', 'technical', 'custom', 'analytics', 'progress', 'typing', 'privacy'];
     return validModes.includes(path) ? path : 'home';
   }, [location.pathname]);
 
@@ -192,11 +193,17 @@ export default function TypingMasterApp() {
         {mode === 'analytics' && <Analytics />}
         {mode === 'progress' && <Progress />}
         {mode === 'typing' && <TypingPage />}
+        {mode === 'privacy' && <PrivacyPolicy />}
       </main>
 
       {/* Footer Banner Ad */}
-      <footer className="max-w-7xl mx-auto px-4 py-6 flex justify-center">
+      <footer className="max-w-7xl mx-auto px-4 py-6 flex flex-col items-center gap-4">
         <AdBanner adSlot="footerBanner" size="728x90" />
+        <div className="flex gap-4 text-sm text-gray-500">
+          <span>© {new Date().getFullYear()} TypeMaster Pro</span>
+          <span>•</span>
+          <button onClick={() => setMode('privacy')} className="hover:text-gray-300">Privacy & Terms</button>
+        </div>
       </footer>
     </div>
   );

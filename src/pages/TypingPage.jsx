@@ -146,6 +146,7 @@ const TypingPage = () => {
                             <button
                                 onClick={() => startSession(practiceText, currentLesson, currentEssay, currentDoc)}
                                 className="px-5 py-2 bg-gray-700 hover:bg-gray-600 rounded-lg font-medium flex items-center gap-2"
+                                aria-label="Restart session"
                             >
                                 <RotateCcw className="w-4 h-4" />
                                 Restart
@@ -161,6 +162,7 @@ const TypingPage = () => {
                                     }}
                                     disabled={!LESSONS.find(l => l.id === currentLesson.id + 1) || !userData.lessonsCompleted.includes(currentLesson.id)}
                                     className="px-5 py-2 bg-cyan-600 hover:bg-cyan-500 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg font-medium flex items-center gap-2"
+                                    aria-label="Go to next lesson"
                                 >
                                     Next Lesson
                                     <ChevronRight className="w-4 h-4" />
@@ -175,6 +177,7 @@ const TypingPage = () => {
                                     }}
                                     disabled={!ESSAYS.find(e => e.id === currentEssay.id + 1)}
                                     className="px-5 py-2 bg-purple-600 hover:bg-purple-500 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg font-medium flex items-center gap-2"
+                                    aria-label="Go to next essay"
                                 >
                                     Next Essay
                                     <ChevronRight className="w-4 h-4" />
@@ -189,6 +192,7 @@ const TypingPage = () => {
                                     else navigate('/home');
                                 }}
                                 className="px-5 py-2 bg-gray-700 hover:bg-gray-600 rounded-lg font-medium flex items-center gap-2"
+                                aria-label="Go back to content list"
                             >
                                 <ChevronLeft className="w-4 h-4" />
                                 Back
