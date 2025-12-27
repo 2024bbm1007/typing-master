@@ -795,47 +795,16 @@ export default function TypingMasterApp() {
                 </div>
               )}
 
-              {/* Text Display */}
-              <div className="bg-gray-900/50 rounded-lg p-5 mb-5 font-mono text-lg leading-relaxed max-h-64 overflow-y-auto whitespace-pre-wrap break-words">
-                {practiceText.split('').map((char, idx) => renderChar(char, idx))}
-              </div>
-
-              {/* Progress Bar */}
-              <div className="mb-5">
-                <div className="h-2 bg-gray-700 rounded-full overflow-hidden">
-                  <div
-                    className="h-full bg-gradient-to-r from-cyan-500 to-blue-600 transition-all"
-                    style={{ width: `${(currentIndex / practiceText.length) * 100}%` }}
-                  />
-                </div>
-                <div className="text-sm text-gray-400 mt-1 text-center">
-                  {Math.round((currentIndex / practiceText.length) * 100)}% Complete
-                </div>
-              </div>
-
-              {/* Input Field */}
-              {!sessionComplete && (
-                <input
-                  ref={inputRef}
-                  type="text"
-                  value={userInput}
-                  onChange={handleTyping}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Backspace') {
-                      e.preventDefault();
-                    }
-                  }}
-                  onPaste={(e) => {
-                    e.preventDefault();
-                  }}
-                  className="w-full bg-gray-900 border-2 border-gray-700 focus:border-cyan-500 rounded-lg px-4 py-3 font-mono outline-none mb-5"
-                  placeholder="Start typing here..."
-                  autoComplete="off"
-                  autoCorrect="off"
-                  autoCapitalize="off"
-                  spellCheck="false"
-                />
-              )}
+              <TypingArea
+                text={practiceText}
+                userInput={userInput}
+                currentIndex={currentIndex}
+                errors={errors}
+                onInputChange={handleTyping}
+                inputRef={inputRef}
+                showResults={sessionComplete}
+                disabled={sessionComplete}
+              />
 
               {/* Session Results */}
               {sessionComplete && sessionResults && (
