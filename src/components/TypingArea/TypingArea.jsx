@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { memo } from 'react';
 
-const TypingArea = ({
+const TypingArea = memo(({
   text,
   userInput,
   currentIndex,
@@ -80,6 +80,8 @@ const TypingArea = ({
       )}
     </div>
   );
-};
+});
+
+TypingArea.displayName = 'TypingArea';
 
 export default TypingArea;

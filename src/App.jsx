@@ -1,4 +1,5 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { Trophy, Target, Zap, TrendingUp, Award, Flame, Star, Clock, CheckCircle, ChevronRight, ChevronLeft, Upload, Code, FileText, BarChart3, Crown, Lock, RotateCcw, Home } from 'lucide-react';
 
 // Import data, utilities, and components
@@ -23,7 +24,20 @@ import AdUnlockService from './services/adUnlockService';
 // ============================================
 
 export default function TypingMasterApp() {
-  const [mode, setMode] = useState('home');
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  // Derive mode from URL path
+  const mode = useMemo(() => {
+    const path = location.pathname.substring(1); // Remove leading '/'
+    const validModes = ['home', 'lessons', 'essays', 'technical', 'custom', 'analytics', 'progress', 'typing'];
+    return validModes.includes(path) ? path : 'home';
+  }, [location.pathname]);
+
+  const setMode = useCallback((newMode) => {
+    navigate(`/${newMode}`);
+  }, [navigate]);
+
   const [showCustomTextModal, setShowCustomTextModal] = useState(false);
   const [showInterstitial, setShowInterstitial] = useState(false);
   const [customText, setCustomText] = useState('');
@@ -61,7 +75,7 @@ export default function TypingMasterApp() {
   const startSession = useCallback((text, lesson = null, essay = null, doc = null) => {
     startContextSession(text, lesson, essay, doc);
     setMode('typing');
-  }, [startContextSession]);
+  }, [startContextSession, setMode]);
 
   useEffect(() => {
     setTimeout(() => inputRef.current?.focus(), 100);
@@ -88,29 +102,6 @@ export default function TypingMasterApp() {
     setCustomText('');
   };
 
-
-
-  const renderChar = (char, index) => {
-    let className = 'inline transition-all duration-75';
-
-    if (index < currentIndex) {
-      if (errors.includes(index)) {
-        className += ' bg-red-500 text-white rounded px-0.5';
-      } else {
-        className += ' text-emerald-400';
-      }
-    } else if (index === currentIndex) {
-      className += ' bg-yellow-400 text-gray-900 rounded px-0.5 animate-pulse';
-    } else {
-      className += ' text-gray-500';
-    }
-
-    if (char === ' ') {
-      return <span key={index} className={className}> </span>;
-    }
-
-    return <span key={index} className={className}>{char}</span>;
-  };
 
   const sections = [... new Set(LESSONS.map(l => l.section))];
   const filteredLessons = selectedSection === 'all'
