@@ -17,7 +17,7 @@ export const useTyping = () => {
 export const TypingProvider = ({ children }) => {
   // User data state
   const [userData, setUserData] = useState(StorageService.getDefaultUserData());
-  
+
   // Session state
   const [practiceText, setPracticeText] = useState('');
   const [userInput, setUserInput] = useState('');
@@ -29,15 +29,15 @@ export const TypingProvider = ({ children }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [sessionComplete, setSessionComplete] = useState(false);
   const [sessionResults, setSessionResults] = useState(null);
-  
+
   // Current content state
   const [currentLesson, setCurrentLesson] = useState(null);
   const [currentEssay, setCurrentEssay] = useState(null);
   const [currentDoc, setCurrentDoc] = useState(null);
-  
+
   // Notification state
   const [notification, setNotification] = useState(null);
-  
+
   const inputRef = useRef(null);
 
   // Load user data on mount
@@ -71,7 +71,7 @@ export const TypingProvider = ({ children }) => {
     const today = new Date().toDateString();
     const lastDate = new Date(data.lastPracticeDate).toDateString();
     const yesterday = new Date(Date.now() - 86400000).toDateString();
-    
+
     if (lastDate !== today && lastDate !== yesterday) {
       setUserData(prev => ({ ...prev, currentStreak: 0 }));
     }
@@ -96,23 +96,23 @@ export const TypingProvider = ({ children }) => {
     setCurrentDoc(doc);
     setSessionComplete(false);
     setSessionResults(null);
-    
+
     setTimeout(() => inputRef.current?.focus(), 100);
   }, []);
 
   const handleTyping = useCallback((e) => {
     const value = e.target.value;
-    
+
     if (!isTyping && value.length > 0) {
       setIsTyping(true);
       setStartTime(Date.now());
     }
 
     setUserInput(value);
-    
+
     const newErrors = [];
     let correct = 0;
-    
+
     for (let i = 0; i < value.length && i < practiceText.length; i++) {
       if (value[i] === practiceText[i]) {
         correct++;
@@ -120,10 +120,10 @@ export const TypingProvider = ({ children }) => {
         newErrors.push(i);
       }
     }
-    
+
     setErrors(newErrors);
     setCurrentIndex(value.length);
-    
+
     const acc = value.length > 0 ? Math.round((correct / value.length) * 100) : 100;
     setAccuracy(acc);
 
@@ -134,17 +134,17 @@ export const TypingProvider = ({ children }) => {
 
   const checkAchievements = (data) => {
     const unlocked = [];
-    
+
     ACHIEVEMENTS.forEach(ach => {
       if (data.achievements.includes(ach.id)) return;
-      
+
       const { type, value } = ach.requirement;
-      
+
       switch (type) {
         case 'wpm':
           if (data.bestWpm >= value) unlocked.push(ach.id);
           break;
-        case 'accuracy': 
+        case 'accuracy':
           if (data.sessionHistory.some(s => s.accuracy >= value)) unlocked.push(ach.id);
           break;
         case 'accuracy_streak':
@@ -153,29 +153,26 @@ export const TypingProvider = ({ children }) => {
         case 'streak':
           if (data.currentStreak >= value) unlocked.push(ach.id);
           break;
-        case 'sessions': 
+        case 'sessions':
           if (data.totalSessions >= value) unlocked.push(ach.id);
           break;
         case 'lessons':
           if (data.lessonsCompleted.length >= value) unlocked.push(ach.id);
           break;
-        case 'essays': 
+        case 'essays':
           if (data.essaysCompleted.length >= value) unlocked.push(ach.id);
           break;
-        case 'docs': 
+        case 'docs':
           if (data.docsCompleted.length >= value) unlocked.push(ach.id);
           break;
         case 'time':
           if (data.totalTime >= value) unlocked.push(ach.id);
           break;
-        case 'premium':
-          if (data.isPremium) unlocked.push(ach.id);
-          break;
         default:
           break;
       }
     });
-    
+
     return unlocked;
   };
 
@@ -183,10 +180,10 @@ export const TypingProvider = ({ children }) => {
     if (sessionComplete) return;
     setSessionComplete(true);
     setIsTyping(false);
-    
+
     const duration = startTime ? (Date.now() - startTime) / 1000 : 0;
     const today = new Date().toDateString();
-    
+
     const keyErrorsUpdate = { ...userData.keyErrors };
     finalErrors.forEach(idx => {
       if (idx < practiceText.length) {
@@ -194,9 +191,9 @@ export const TypingProvider = ({ children }) => {
         keyErrorsUpdate[expectedKey] = (keyErrorsUpdate[expectedKey] || 0) + 1;
       }
     });
-    
+
     const xpEarned = calculateXP(finalWpm, finalAccuracy, practiceText.length);
-    
+
     let newStreak = userData.currentStreak;
     if (userData.lastPracticeDate) {
       const lastDate = new Date(userData.lastPracticeDate).toDateString();
@@ -224,7 +221,7 @@ export const TypingProvider = ({ children }) => {
     const updatedData = {
       ...userData,
       bestWpm: Math.max(userData.bestWpm, finalWpm),
-      averageWpm: userData.totalSessions > 0 
+      averageWpm: userData.totalSessions > 0
         ? Math.round((userData.averageWpm * userData.totalSessions + finalWpm) / (userData.totalSessions + 1))
         : finalWpm,
       averageAccuracy: userData.totalSessions > 0
@@ -282,25 +279,11 @@ export const TypingProvider = ({ children }) => {
     return userData.lessonsCompleted.includes(lesson.id - 1);
   }, [userData.lessonsCompleted]);
 
-  const handlePayment = useCallback(() => {
-    const premiumUntil = new Date();
-    premiumUntil.setFullYear(premiumUntil.getFullYear() + 1);
-    
-    setUserData(prev => ({
-      ...prev,
-      isPremium: true,
-      premiumUntil: premiumUntil.toISOString(),
-      achievements: [...new Set([...prev.achievements, 'premium'])]
-    }));
-    
-    showNotificationMsg('🎉 Premium activated! Enjoy all analytics features.');
-  }, [showNotificationMsg]);
-
   const value = {
     // User data
     userData,
     setUserData,
-    
+
     // Session state
     practiceText,
     userInput,
@@ -312,23 +295,22 @@ export const TypingProvider = ({ children }) => {
     currentIndex,
     sessionComplete,
     sessionResults,
-    
+
     // Current content
     currentLesson,
     currentEssay,
     currentDoc,
-    
+
     // Notification
     notification,
     showNotificationMsg,
-    
+
     // Actions
     startSession,
     handleTyping,
     completeSession,
     isLessonUnlocked,
-    handlePayment,
-    
+
     // Refs
     inputRef
   };

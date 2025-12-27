@@ -11,10 +11,9 @@ import Keyboard from './components/Keyboard';
 import ModeSelector from './components/ModeSelector';
 
 
-// Import Ad and Payment components
+// Import Ad components
 import { AdBanner, AdInterstitial, FeatureGate } from './components/Ads';
 import { useTyping } from './context/TypingContext';
-import { PaymentModal } from './components/Payment';
 import AdService from './services/adService';
 import AdUnlockService from './services/adUnlockService';
 
@@ -25,12 +24,11 @@ import AdUnlockService from './services/adUnlockService';
 
 export default function TypingMasterApp() {
   const [mode, setMode] = useState('home');
-  const [showPaymentModal, setShowPaymentModal] = useState(false);
   const [showCustomTextModal, setShowCustomTextModal] = useState(false);
   const [showInterstitial, setShowInterstitial] = useState(false);
   const [customText, setCustomText] = useState('');
   const [selectedSection, setSelectedSection] = useState('all');
-// Connect to global TypingContext
+  // Connect to global TypingContext
   const {
     // State
     userData,
@@ -47,19 +45,18 @@ export default function TypingMasterApp() {
     sessionComplete,
     sessionResults,
     notification,
-    
+
     // Actions
     startSession: startContextSession,
     handleTyping,
     isLessonUnlocked,
-    handlePayment,
     showNotificationMsg,
-    
+
     // Refs
     inputRef
   } = useTyping();
 
-  
+
 
   const startSession = useCallback((text, lesson = null, essay = null, doc = null) => {
     startContextSession(text, lesson, essay, doc);
@@ -70,34 +67,34 @@ export default function TypingMasterApp() {
     setTimeout(() => inputRef.current?.focus(), 100);
   }, [inputRef]);
 
-  
-   
 
- 
 
-  
 
-  
 
-  
+
+
+
+
+
+
 
   const handleCustomTextSubmit = () => {
     if (customText.trim().length < 20) {
       showNotificationMsg('Please enter at least 20 characters', 'error');
       return;
     }
-    startSession(customText. trim());
+    startSession(customText.trim());
     setShowCustomTextModal(false);
     setCustomText('');
   };
 
-  
+
 
   const renderChar = (char, index) => {
     let className = 'inline transition-all duration-75';
-    
+
     if (index < currentIndex) {
-      if (errors. includes(index)) {
+      if (errors.includes(index)) {
         className += ' bg-red-500 text-white rounded px-0.5';
       } else {
         className += ' text-emerald-400';
@@ -107,17 +104,17 @@ export default function TypingMasterApp() {
     } else {
       className += ' text-gray-500';
     }
-    
+
     if (char === ' ') {
       return <span key={index} className={className}>&nbsp;</span>;
     }
-    
+
     return <span key={index} className={className}>{char}</span>;
   };
 
   const sections = [... new Set(LESSONS.map(l => l.section))];
-  const filteredLessons = selectedSection === 'all' 
-    ?  LESSONS 
+  const filteredLessons = selectedSection === 'all'
+    ? LESSONS
     : LESSONS.filter(l => l.section === selectedSection);
 
   // Analytics Components
@@ -178,7 +175,7 @@ export default function TypingMasterApp() {
       );
     }
 
-    const data = userData.wpmHistory. slice(-15);
+    const data = userData.wpmHistory.slice(-15);
     const maxWpm = Math.max(...data.map(d => d.wpm), 1);
     const chartHeight = 120;
 
@@ -220,10 +217,9 @@ export default function TypingMasterApp() {
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-slate-900 to-gray-900 text-white">
       {/* Notification */}
       {notification && (
-        <div className={`fixed top-4 right-4 z-50 px-4 py-3 rounded-lg shadow-lg ${
-          notification.type === 'success' ? 'bg-emerald-500' : 
+        <div className={`fixed top-4 right-4 z-50 px-4 py-3 rounded-lg shadow-lg ${notification.type === 'success' ? 'bg-emerald-500' :
           notification.type === 'warning' ? 'bg-yellow-500' : 'bg-red-500'
-        }`}>
+          }`}>
           {notification.message}
         </div>
       )}
@@ -238,14 +234,6 @@ export default function TypingMasterApp() {
         />
       )}
 
-      {/* Payment Modal */}
-      {showPaymentModal && (
-        <PaymentModal
-          onClose={() => setShowPaymentModal(false)}
-          onPaymentSuccess={handlePayment}
-        />
-      )}
-
       {/* Custom Text Modal */}
       {showCustomTextModal && (
         <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
@@ -257,7 +245,7 @@ export default function TypingMasterApp() {
 
             <textarea
               value={customText}
-              onChange={(e) => setCustomText(e. target.value)}
+              onChange={(e) => setCustomText(e.target.value)}
               placeholder="Paste or type your custom text here (minimum 20 characters)..."
               className="w-full h-48 bg-gray-900 border border-gray-700 rounded-lg p-4 text-sm focus:border-cyan-500 outline-none resize-none"
             />
@@ -297,21 +285,11 @@ export default function TypingMasterApp() {
               <div>
                 <h1 className="text-xl font-bold bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent flex items-center gap-2">
                   TypeMaster Pro
-                  {userData.isPremium && <Crown className="w-4 h-4 text-yellow-400" />}
                 </h1>
               </div>
             </div>
-            
+
             <div className="flex items-center gap-2">
-              {!userData.isPremium && (
-                <button
-                  onClick={() => setShowPaymentModal(true)}
-                  className="px-3 py-1.5 bg-gradient-to-r from-yellow-500 to-orange-500 rounded-lg font-semibold text-xs hover:shadow-lg flex items-center gap-1"
-                >
-                  <Crown className="w-3 h-3" />
-                  Premium ₹19
-                </button>
-              )}
               <div className="flex items-center gap-1.5 px-2 py-1 bg-orange-500/10 border border-orange-500/30 rounded-lg">
                 <Flame className="w-4 h-4 text-orange-400" />
                 <span className="font-semibold text-orange-400 text-sm">{userData.currentStreak}</span>
@@ -323,29 +301,27 @@ export default function TypingMasterApp() {
               <ThemeToggle />
             </div>
           </div>
-          
+
           <nav className="flex gap-1.5 mt-3 overflow-x-auto pb-1">
             {[
               { id: 'home', label: 'Home', icon: Home },
-              { id: 'lessons', label: 'Lessons', icon:  FileText },
+              { id: 'lessons', label: 'Lessons', icon: FileText },
               { id: 'essays', label: 'Essays', icon: FileText },
               { id: 'technical', label: 'Technical', icon: Code },
               { id: 'custom', label: 'Custom', icon: Upload },
-              { id: 'analytics', label: 'Analytics', icon:  BarChart3 },
+              { id: 'analytics', label: 'Analytics', icon: BarChart3 },
               { id: 'progress', label: 'Progress', icon: Trophy }
             ].map(tab => (
               <button
                 key={tab.id}
                 onClick={() => setMode(tab.id)}
-                className={`px-3 py-1.5 rounded-lg font-medium text-sm transition-all whitespace-nowrap flex items-center gap-1.5 ${
-                  mode === tab.id 
-                    ? 'bg-gradient-to-r from-cyan-500 to-blue-600 text-white' 
-                    : 'text-gray-400 hover:text-white hover:bg-gray-800'
-                }`}
+                className={`px-3 py-1.5 rounded-lg font-medium text-sm transition-all whitespace-nowrap flex items-center gap-1.5 ${mode === tab.id
+                  ? 'bg-gradient-to-r from-cyan-500 to-blue-600 text-white'
+                  : 'text-gray-400 hover:text-white hover:bg-gray-800'
+                  }`}
               >
                 <tab.icon className="w-4 h-4" />
                 {tab.label}
-                {tab.id === 'analytics' && !userData.isPremium && <Lock className="w-3 h-3" />}
               </button>
             ))}
           </nav>
@@ -353,15 +329,13 @@ export default function TypingMasterApp() {
       </header>
 
       {/* Header Banner Ad */}
-      {!userData.isPremium && (
-        <div className="max-w-7xl mx-auto px-4 py-3 flex justify-center">
-          <AdBanner adSlot="headerBanner" size="728x90" />
-        </div>
-      )}
+      <div className="max-w-7xl mx-auto px-4 py-3 flex justify-center">
+        <AdBanner adSlot="headerBanner" size="728x90" />
+      </div>
 
-       {/* Main Content */}
-       <main className="max-w-7xl mx-auto px-4 py-6">
-        
+      {/* Main Content */}
+      <main className="max-w-7xl mx-auto px-4 py-6">
+
         {/* HOME MODE */}
         {mode === 'home' && (
           <div className="space-y-6">
@@ -449,7 +423,7 @@ export default function TypingMasterApp() {
                 </h3>
                 <div className="flex flex-wrap gap-3">
                   {userData.achievements.slice(-6).map(achId => {
-                    const ach = ACHIEVEMENTS. find(a => a.id === achId);
+                    const ach = ACHIEVEMENTS.find(a => a.id === achId);
                     if (!ach) return null;
                     return (
                       <div key={achId} className="bg-gray-900/50 rounded-lg px-3 py-2 border border-yellow-500/20">
@@ -475,9 +449,8 @@ export default function TypingMasterApp() {
               <div className="flex gap-2 flex-wrap">
                 <button
                   onClick={() => setSelectedSection('all')}
-                  className={`px-3 py-1.5 rounded-lg text-sm font-medium ${
-                    selectedSection === 'all' ? 'bg-cyan-500 text-white' : 'bg-gray-800 text-gray-400'
-                  }`}
+                  className={`px-3 py-1.5 rounded-lg text-sm font-medium ${selectedSection === 'all' ? 'bg-cyan-500 text-white' : 'bg-gray-800 text-gray-400'
+                    }`}
                 >
                   All
                 </button>
@@ -485,33 +458,31 @@ export default function TypingMasterApp() {
                   <button
                     key={section}
                     onClick={() => setSelectedSection(section)}
-                    className={`px-3 py-1.5 rounded-lg text-sm font-medium ${
-                      selectedSection === section ? 'bg-cyan-500 text-white' : 'bg-gray-800 text-gray-400'
-                    }`}
+                    className={`px-3 py-1.5 rounded-lg text-sm font-medium ${selectedSection === section ? 'bg-cyan-500 text-white' : 'bg-gray-800 text-gray-400'
+                      }`}
                   >
                     {section}
                   </button>
                 ))}
               </div>
             </div>
-            
+
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {filteredLessons. map((lesson, index) => {
+              {filteredLessons.map((lesson, index) => {
                 const isCompleted = userData.lessonsCompleted.includes(lesson.id);
                 const isUnlocked = isLessonUnlocked(lesson);
-                
+
                 return (
                   <React.Fragment key={lesson.id}>
                     <button
                       onClick={() => isUnlocked && startSession(lesson.text, lesson)}
                       disabled={!isUnlocked}
-                      className={`p-4 rounded-xl text-left transition-all ${
-                        !isUnlocked 
-                          ? 'bg-gray-800/30 border border-gray-700/50 opacity-50 cursor-not-allowed' 
-                          : isCompleted
+                      className={`p-4 rounded-xl text-left transition-all ${!isUnlocked
+                        ? 'bg-gray-800/30 border border-gray-700/50 opacity-50 cursor-not-allowed'
+                        : isCompleted
                           ? 'bg-emerald-500/10 border border-emerald-500/30 hover:bg-emerald-500/20'
                           : 'bg-gray-800/50 border border-gray-700 hover:bg-gray-700/50 hover:border-cyan-500/50'
-                      }`}
+                        }`}
                     >
                       <div className="flex items-start justify-between mb-2">
                         <div>
@@ -523,18 +494,17 @@ export default function TypingMasterApp() {
                       </div>
                       <div className="text-xs text-gray-400 truncate mb-2 font-mono">{lesson.text}</div>
                       <div className="flex items-center justify-between">
-                        <span className={`px-2 py-0.5 rounded text-xs ${
-                          lesson.difficulty === 'beginner' ? 'bg-green-500/20 text-green-400' :  
+                        <span className={`px-2 py-0.5 rounded text-xs ${lesson.difficulty === 'beginner' ? 'bg-green-500/20 text-green-400' :
                           lesson.difficulty === 'intermediate' ? 'bg-yellow-500/20 text-yellow-400' : 'bg-red-500/20 text-red-400'
-                        }`}>
+                          }`}>
                           {lesson.difficulty}
                         </span>
                         <span className="text-xs text-gray-500">~{lesson.estimatedTime}min</span>
                       </div>
                     </button>
-                    
+
                     {/* Ad placement every 6 lessons */}
-                    {AdService.shouldShowLessonListAd(index) && !userData.isPremium && (
+                    {AdService.shouldShowLessonListAd(index) && (
                       <div className="col-span-full flex justify-center py-2">
                         <AdBanner adSlot="lessonList" size="300x250" />
                       </div>
@@ -553,20 +523,19 @@ export default function TypingMasterApp() {
               <h2 className="text-2xl font-bold">Essay Practice</h2>
               <p className="text-gray-400 text-sm">{userData.essaysCompleted.length}/{ESSAYS.length} completed</p>
             </div>
-            
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {ESSAYS.map(essay => {
                 const isCompleted = userData.essaysCompleted.includes(essay.id);
-                
+
                 return (
                   <button
                     key={essay.id}
                     onClick={() => startSession(essay.text, null, essay)}
-                    className={`p-5 rounded-xl text-left transition-all ${
-                      isCompleted
-                        ? 'bg-emerald-500/10 border border-emerald-500/30 hover:bg-emerald-500/20'
-                        : 'bg-gray-800/50 border border-gray-700 hover:bg-gray-700/50 hover:border-purple-500/50'
-                    }`}
+                    className={`p-5 rounded-xl text-left transition-all ${isCompleted
+                      ? 'bg-emerald-500/10 border border-emerald-500/30 hover:bg-emerald-500/20'
+                      : 'bg-gray-800/50 border border-gray-700 hover:bg-gray-700/50 hover:border-purple-500/50'
+                      }`}
                   >
                     <div className="flex items-start justify-between mb-2">
                       <div className="font-bold text-lg">{essay.title}</div>
@@ -574,10 +543,9 @@ export default function TypingMasterApp() {
                     </div>
                     <p className="text-sm text-gray-400 mb-3 line-clamp-2">{essay.text}</p>
                     <div className="flex items-center justify-between">
-                      <span className={`px-2 py-0.5 rounded text-xs ${
-                        essay.difficulty === 'beginner' ? 'bg-green-500/20 text-green-400' : 
+                      <span className={`px-2 py-0.5 rounded text-xs ${essay.difficulty === 'beginner' ? 'bg-green-500/20 text-green-400' :
                         essay.difficulty === 'intermediate' ? 'bg-yellow-500/20 text-yellow-400' : 'bg-red-500/20 text-red-400'
-                      }`}>
+                        }`}>
                         {essay.difficulty}
                       </span>
                       <span className="text-xs text-gray-500">~{essay.estimatedTime}min</span>
@@ -599,20 +567,19 @@ export default function TypingMasterApp() {
               </h2>
               <p className="text-gray-400 text-sm">{userData.docsCompleted.length}/{TECHNICAL_DOCS.length} completed</p>
             </div>
-            
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {TECHNICAL_DOCS.map(doc => {
                 const isCompleted = userData.docsCompleted.includes(doc.id);
-                
+
                 return (
                   <button
                     key={doc.id}
                     onClick={() => startSession(doc.text, null, null, doc)}
-                    className={`p-5 rounded-xl text-left transition-all ${
-                      isCompleted
-                        ? 'bg-emerald-500/10 border border-emerald-500/30 hover:bg-emerald-500/20'
-                        : 'bg-gray-800/50 border border-gray-700 hover:bg-gray-700/50 hover:border-emerald-500/50'
-                    }`}
+                    className={`p-5 rounded-xl text-left transition-all ${isCompleted
+                      ? 'bg-emerald-500/10 border border-emerald-500/30 hover:bg-emerald-500/20'
+                      : 'bg-gray-800/50 border border-gray-700 hover:bg-gray-700/50 hover:border-emerald-500/50'
+                      }`}
                   >
                     <div className="flex items-start justify-between mb-2">
                       <div>
@@ -647,7 +614,7 @@ export default function TypingMasterApp() {
               <div className="bg-gray-800/50 border border-gray-700 rounded-xl p-6">
                 <h3 className="font-bold mb-4">Import Text</h3>
                 <p className="text-gray-400 text-sm mb-4">
-                  Paste any text you want to practice - articles, documents, or study materials. 
+                  Paste any text you want to practice - articles, documents, or study materials.
                 </p>
                 <button
                   onClick={() => setShowCustomTextModal(true)}
@@ -692,25 +659,21 @@ export default function TypingMasterApp() {
                 Advanced Analytics
               </h2>
               <p className="text-gray-400 text-sm">
-                {userData.isPremium ? 'Deep insights into your performance' : 'Unlock premium for detailed analytics'}
+                Unlock detailed insights
               </p>
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               {/* Progress Charts - Can unlock with ads */}
-              <FeatureGate 
-                featureId="progressCharts" 
-                isPremium={userData.isPremium}
-                onUpgradeToPremium={() => setShowPaymentModal(true)}
+              <FeatureGate
+                featureId="progressCharts"
               >
                 <ProgressChart />
               </FeatureGate>
 
               {/* Weak Key Analysis - Can unlock with ads */}
-              <FeatureGate 
-                featureId="weakKeyAnalysis" 
-                isPremium={userData.isPremium}
-                onUpgradeToPremium={() => setShowPaymentModal(true)}
+              <FeatureGate
+                featureId="weakKeyAnalysis"
               >
                 <WeakKeyAnalysis />
               </FeatureGate>
@@ -718,10 +681,8 @@ export default function TypingMasterApp() {
 
             {/* Session History - Can unlock with ads */}
             {userData.sessionHistory.length > 0 && (
-              <FeatureGate 
-                featureId="sessionHistory" 
-                isPremium={userData.isPremium}
-                onUpgradeToPremium={() => setShowPaymentModal(true)}
+              <FeatureGate
+                featureId="sessionHistory"
               >
                 <div className="bg-gray-800/50 border border-gray-700 rounded-xl p-6">
                   <h3 className="font-bold mb-4">Recent Sessions</h3>
@@ -748,13 +709,13 @@ export default function TypingMasterApp() {
         {mode === 'progress' && (
           <div className="space-y-6">
             <h2 className="text-2xl font-bold">Your Progress</h2>
-            
+
             {/* Progress Bars */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div className="bg-gray-800/50 border border-gray-700 rounded-xl p-5">
                 <h3 className="font-bold mb-3">Lessons</h3>
                 <div className="h-2 bg-gray-700 rounded-full overflow-hidden mb-2">
-                  <div 
+                  <div
                     className="h-full bg-gradient-to-r from-cyan-500 to-blue-600"
                     style={{ width: `${(userData.lessonsCompleted.length / LESSONS.length) * 100}%` }}
                   />
@@ -764,7 +725,7 @@ export default function TypingMasterApp() {
               <div className="bg-gray-800/50 border border-gray-700 rounded-xl p-5">
                 <h3 className="font-bold mb-3">Essays</h3>
                 <div className="h-2 bg-gray-700 rounded-full overflow-hidden mb-2">
-                  <div 
+                  <div
                     className="h-full bg-gradient-to-r from-purple-500 to-pink-600"
                     style={{ width: `${(userData.essaysCompleted.length / ESSAYS.length) * 100}%` }}
                   />
@@ -774,7 +735,7 @@ export default function TypingMasterApp() {
               <div className="bg-gray-800/50 border border-gray-700 rounded-xl p-5">
                 <h3 className="font-bold mb-3">Technical Docs</h3>
                 <div className="h-2 bg-gray-700 rounded-full overflow-hidden mb-2">
-                  <div 
+                  <div
                     className="h-full bg-gradient-to-r from-emerald-500 to-teal-600"
                     style={{ width: `${(userData.docsCompleted.length / TECHNICAL_DOCS.length) * 100}%` }}
                   />
@@ -790,13 +751,12 @@ export default function TypingMasterApp() {
                 {ACHIEVEMENTS.map(ach => {
                   const unlocked = userData.achievements.includes(ach.id);
                   return (
-                    <div 
+                    <div
                       key={ach.id}
-                      className={`rounded-lg p-3 text-center border ${
-                        unlocked 
-                          ? 'bg-yellow-500/10 border-yellow-500/30' 
-                          : 'bg-gray-900/50 border-gray-700/50 opacity-40'
-                      }`}
+                      className={`rounded-lg p-3 text-center border ${unlocked
+                        ? 'bg-yellow-500/10 border-yellow-500/30'
+                        : 'bg-gray-900/50 border-gray-700/50 opacity-40'
+                        }`}
                     >
                       <div className="text-2xl mb-1">{ach.icon}</div>
                       <div className="font-semibold text-xs">{ach.name}</div>
@@ -843,16 +803,16 @@ export default function TypingMasterApp() {
                   </div>
                 </div>
               )}
-              
+
               {/* Text Display */}
               <div className="bg-gray-900/50 rounded-lg p-5 mb-5 font-mono text-lg leading-relaxed max-h-64 overflow-y-auto whitespace-pre-wrap">
-                {practiceText. split('').map((char, idx) => renderChar(char, idx))}
+                {practiceText.split('').map((char, idx) => renderChar(char, idx))}
               </div>
 
               {/* Progress Bar */}
               <div className="mb-5">
                 <div className="h-2 bg-gray-700 rounded-full overflow-hidden">
-                  <div 
+                  <div
                     className="h-full bg-gradient-to-r from-cyan-500 to-blue-600 transition-all"
                     style={{ width: `${(currentIndex / practiceText.length) * 100}%` }}
                   />
@@ -906,11 +866,9 @@ export default function TypingMasterApp() {
                   </div>
 
                   {/* Ad after session complete */}
-                  {!userData.isPremium && (
-                    <div className="flex justify-center mb-5">
-                      <AdBanner adSlot="sessionComplete" size="300x250" />
-                    </div>
-                  )}
+                  <div className="flex justify-center mb-5">
+                    <AdBanner adSlot="sessionComplete" size="300x250" />
+                  </div>
                 </>
               )}
 
@@ -923,7 +881,7 @@ export default function TypingMasterApp() {
                   <RotateCcw className="w-4 h-4" />
                   Restart
                 </button>
-                
+
                 {currentLesson && (
                   <button
                     onClick={() => {
@@ -932,7 +890,7 @@ export default function TypingMasterApp() {
                         startSession(nextLesson.text, nextLesson);
                       }
                     }}
-                    disabled={!LESSONS.find(l => l.id === currentLesson.id + 1) || !userData.lessonsCompleted. includes(currentLesson.id)}
+                    disabled={!LESSONS.find(l => l.id === currentLesson.id + 1) || !userData.lessonsCompleted.includes(currentLesson.id)}
                     className="px-5 py-2 bg-cyan-600 hover:bg-cyan-500 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg font-medium flex items-center gap-2"
                   >
                     Next Lesson
@@ -971,18 +929,16 @@ export default function TypingMasterApp() {
 
             {/* Tip */}
             <div className="bg-blue-500/10 border border-blue-500/30 rounded-xl p-4 text-sm">
-              <strong className="text-blue-400">💡 Tip: </strong> Focus on accuracy first, speed will come naturally! 
+              <strong className="text-blue-400">💡 Tip: </strong> Focus on accuracy first, speed will come naturally!
             </div>
           </div>
         )}
       </main>
 
       {/* Footer Banner Ad */}
-      {!userData.isPremium && (
-        <footer className="max-w-7xl mx-auto px-4 py-6 flex justify-center">
-          <AdBanner adSlot="footerBanner" size="728x90" />
-        </footer>
-      )}
+      <footer className="max-w-7xl mx-auto px-4 py-6 flex justify-center">
+        <AdBanner adSlot="footerBanner" size="728x90" />
+      </footer>
 
       {/* CSS for line-clamp */}
       <style>{`

@@ -11,8 +11,8 @@ const AdService = {
    * @param {boolean} isPremium - Whether user has premium
    * @returns {boolean} Should show ads
    */
-  shouldShowAds(isPremium) {
-    return AD_CONFIG.enabled && !isPremium;
+  shouldShowAds() {
+    return AD_CONFIG.enabled;
   },
 
   /**
@@ -21,8 +21,8 @@ const AdService = {
    * @param {boolean} isPremium - Whether user has premium
    * @returns {boolean} Should show interstitial
    */
-  shouldShowInterstitial(sessionCount, isPremium) {
-    if (!this.shouldShowAds(isPremium)) return false;
+  shouldShowInterstitial(sessionCount) {
+    if (!this.shouldShowAds()) return false;
     return sessionCount > 0 && sessionCount % AD_CONFIG.rules.interstitialFrequency === 0;
   },
 
@@ -52,7 +52,7 @@ const AdService = {
   canWatchRewardedAd(featureId) {
     const lastWatched = localStorage.getItem(`lastRewardedAd_${featureId}`);
     if (!lastWatched) return true;
-    
+
     const timeSinceLastAd = (Date.now() - parseInt(lastWatched)) / 1000;
     return timeSinceLastAd >= AD_CONFIG.rules.rewardedAdCooldown;
   },
@@ -73,7 +73,7 @@ const AdService = {
   getRewardedAdCooldown(featureId) {
     const lastWatched = localStorage.getItem(`lastRewardedAd_${featureId}`);
     if (!lastWatched) return 0;
-    
+
     const timeSinceLastAd = (Date.now() - parseInt(lastWatched)) / 1000;
     const remaining = AD_CONFIG.rules.rewardedAdCooldown - timeSinceLastAd;
     return Math.max(0, Math.ceil(remaining));

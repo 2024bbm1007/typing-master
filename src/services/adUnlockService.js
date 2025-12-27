@@ -16,22 +16,22 @@ const AdUnlockService = {
   getFeatureUnlock(featureId) {
     const unlocks = this._getUnlocks();
     const unlock = unlocks[featureId];
-    
+
     if (!unlock) {
       return { unlocked: false, adsWatched: 0 };
     }
-    
+
     // Check if still valid
     if (unlock.expiresAt && Date.now() > unlock.expiresAt) {
       // Clean up expired unlock
       this._removeUnlock(featureId);
       return { unlocked: false, adsWatched: 0, expired: true };
     }
-    
-    return { 
-      unlocked: true, 
+
+    return {
+      unlocked: true,
       expiresAt: unlock.expiresAt,
-      unlockedAt: unlock.unlockedAt 
+      unlockedAt: unlock.unlockedAt
     };
   },
 
@@ -49,39 +49,39 @@ const AdUnlockService = {
 
     const unlocks = this._getUnlocks();
     const current = unlocks[featureId] || { adsWatched: 0 };
-    
+
     // Increment ads watched
     const newAdsWatched = (current.adsWatched || 0) + 1;
-    
+
     // Check if feature should be unlocked
     if (newAdsWatched >= config.adsRequired) {
-      const expiresAt = config.unlockDuration > 0 
-        ? Date.now() + config.unlockDuration 
+      const expiresAt = config.unlockDuration > 0
+        ? Date.now() + config.unlockDuration
         : null; // No expiration for one-time unlocks
-      
+
       unlocks[featureId] = {
         adsWatched: newAdsWatched,
         unlockedAt: Date.now(),
         expiresAt
       };
-      
+
       this._saveUnlocks(unlocks);
-      
-      return { 
-        unlocked: true, 
+
+      return {
+        unlocked: true,
         adsWatched: newAdsWatched,
-        expiresAt 
+        expiresAt
       };
     } else {
       // Not yet unlocked, update progress
       unlocks[featureId] = {
         adsWatched: newAdsWatched
       };
-      
+
       this._saveUnlocks(unlocks);
-      
-      return { 
-        unlocked: false, 
+
+      return {
+        unlocked: false,
         adsWatched: newAdsWatched,
         adsRemaining: config.adsRequired - newAdsWatched
       };
@@ -94,9 +94,7 @@ const AdUnlockService = {
    * @param {boolean} isPremium - Whether user has premium
    * @returns {boolean} Is feature accessible
    */
-  isFeatureAccessible(featureId, isPremium) {
-    if (isPremium) return true;
-    
+  isFeatureAccessible(featureId) {
     const unlock = this.getFeatureUnlock(featureId);
     return unlock.unlocked;
   },
@@ -108,11 +106,11 @@ const AdUnlockService = {
    */
   getTimeRemaining(featureId) {
     const unlock = this.getFeatureUnlock(featureId);
-    
+
     if (!unlock.unlocked || !unlock.expiresAt) {
       return 0;
     }
-    
+
     return Math.max(0, unlock.expiresAt - Date.now());
   },
 
@@ -124,10 +122,10 @@ const AdUnlockService = {
   getFormattedTimeRemaining(featureId) {
     const ms = this.getTimeRemaining(featureId);
     if (ms === 0) return '0m';
-    
+
     const hours = Math.floor(ms / (1000 * 60 * 60));
     const minutes = Math.floor((ms % (1000 * 60 * 60)) / (1000 * 60));
-    
+
     if (hours > 0) {
       return `${hours}h ${minutes}m`;
     }
@@ -142,11 +140,11 @@ const AdUnlockService = {
   getProgress(featureId) {
     const config = AD_UNLOCK_CONFIG.features[featureId];
     if (!config) return { current: 0, required: 0, unlocked: false };
-    
+
     const unlock = this.getFeatureUnlock(featureId);
     const unlocks = this._getUnlocks();
     const current = unlock.unlocked ? config.adsRequired : (unlocks[featureId]?.adsWatched || 0);
-    
+
     return {
       current,
       required: config.adsRequired,

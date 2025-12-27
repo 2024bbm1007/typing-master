@@ -30,7 +30,16 @@ const StorageService = {
   },
 
   getUserData() {
-    return this.get(this.KEYS.USER_DATA) || this.getDefaultUserData();
+    const storedData = this.get(this.KEYS.USER_DATA);
+    if (!storedData) return this.getDefaultUserData();
+
+    // Merge stored data with default data to ensure all fields exist
+    // This handles backward compatibility when new fields are added
+    const merged = { ...this.getDefaultUserData(), ...storedData };
+    // Explicitly remove legacy premium fields if they exist
+    delete merged.isPremium;
+    delete merged.premiumUntil;
+    return merged;
   },
 
   setUserData(data) {
@@ -39,8 +48,6 @@ const StorageService = {
 
   getDefaultUserData() {
     return {
-      isPremium: false,
-      premiumUntil: null,
       bestWpm: 0,
       averageWpm: 0,
       averageAccuracy: 0,
