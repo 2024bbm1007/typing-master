@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Zap, Flame, Star, Home as HomeIcon, FileText, Code, Upload, BarChart3, Trophy } from 'lucide-react';
+import { Zap, Flame, Star, Home as HomeIcon, FileText, Code, Upload, BarChart3, Trophy, BookOpen } from 'lucide-react';
 
 import ThemeToggle from './components/ThemeToggle';
 import { AdBanner, AdInterstitial } from './components/Ads';
@@ -17,7 +17,9 @@ import CustomPractice from './pages/CustomPractice';
 import Analytics from './pages/Analytics';
 import Progress from './pages/Progress';
 import TypingPage from './pages/TypingPage';
+import Blog from './pages/Blog';
 import PrivacyPolicy from './pages/PrivacyPolicy';
+
 
 export default function TypingMasterApp() {
   const navigate = useNavigate();
@@ -32,7 +34,7 @@ export default function TypingMasterApp() {
   // Derive mode from URL path
   const mode = useMemo(() => {
     const path = location.pathname.substring(1); // Remove leading '/'
-    const validModes = ['home', 'lessons', 'essays', 'technical', 'custom', 'analytics', 'progress', 'typing', 'privacy'];
+    const validModes = ['home', 'lessons', 'essays', 'technical', 'custom', 'analytics', 'progress', 'typing', 'privacy', 'blog'];
     return validModes.includes(path) ? path : 'home';
   }, [location.pathname]);
 
@@ -151,15 +153,15 @@ export default function TypingMasterApp() {
               { id: 'technical', label: 'Technical', icon: Code },
               { id: 'custom', label: 'Custom', icon: Upload },
               { id: 'analytics', label: 'Analytics', icon: BarChart3 },
-              { id: 'progress', label: 'Progress', icon: Trophy }
+              { id: 'progress', label: 'Progress', icon: Trophy },
+              { id: 'blog', label: 'Blog', icon: BookOpen }
             ].map(tab => (
               <button
                 key={tab.id}
                 onClick={() => setMode(tab.id)}
                 className={`px-3 py-1.5 rounded-lg font-medium text-sm transition-all whitespace-nowrap flex items-center gap-1.5 ${mode === tab.id
                   ? 'bg-gradient-to-r from-cyan-500 to-blue-600 text-white'
-                  : 'text-gray-400 hover:text-white hover:bg-gray-800'
-                  }`}
+                  : 'text-gray-400 hover:text-white hover:bg-gray-800'}`}
               >
                 <tab.icon className="w-4 h-4" />
                 {tab.label}
@@ -192,6 +194,7 @@ export default function TypingMasterApp() {
         )}
         {mode === 'analytics' && <Analytics />}
         {mode === 'progress' && <Progress />}
+        {mode === 'blog' && <Blog />}
         {mode === 'typing' && <TypingPage />}
         {mode === 'privacy' && <PrivacyPolicy />}
       </main>
