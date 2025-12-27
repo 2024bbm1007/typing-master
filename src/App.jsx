@@ -106,7 +106,7 @@ export default function TypingMasterApp() {
     }
 
     if (char === ' ') {
-      return <span key={index} className={className}>&nbsp;</span>;
+      return <span key={index} className={className}> </span>;
     }
 
     return <span key={index} className={className}>{char}</span>;
@@ -805,7 +805,7 @@ export default function TypingMasterApp() {
               )}
 
               {/* Text Display */}
-              <div className="bg-gray-900/50 rounded-lg p-5 mb-5 font-mono text-lg leading-relaxed max-h-64 overflow-y-auto whitespace-pre-wrap">
+              <div className="bg-gray-900/50 rounded-lg p-5 mb-5 font-mono text-lg leading-relaxed max-h-64 overflow-y-auto whitespace-pre-wrap break-words">
                 {practiceText.split('').map((char, idx) => renderChar(char, idx))}
               </div>
 
@@ -829,6 +829,14 @@ export default function TypingMasterApp() {
                   type="text"
                   value={userInput}
                   onChange={handleTyping}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Backspace') {
+                      e.preventDefault();
+                    }
+                  }}
+                  onPaste={(e) => {
+                    e.preventDefault();
+                  }}
                   className="w-full bg-gray-900 border-2 border-gray-700 focus:border-cyan-500 rounded-lg px-4 py-3 font-mono outline-none mb-5"
                   placeholder="Start typing here..."
                   autoComplete="off"
@@ -857,11 +865,16 @@ export default function TypingMasterApp() {
                         <div className="text-xs text-gray-400">XP Earned</div>
                       </div>
                     </div>
-                    {sessionResults.accuracy >= 95 && (
-                      <p className="text-sm text-emerald-400">✓ Content marked as completed! </p>
+                    {sessionResults.accuracy >= 80 && (
+                      <div className="space-y-1">
+                        <p className="text-sm text-emerald-400">✓ Content marked as completed! </p>
+                        {sessionResults.accuracy < 95 && (
+                          <p className="text-xs text-cyan-400/70">Tip: Aim for 95%+ accuracy for mastery (Suggested)</p>
+                        )}
+                      </div>
                     )}
-                    {sessionResults.accuracy < 95 && (
-                      <p className="text-sm text-yellow-400">⚠ Need 95%+ accuracy to complete</p>
+                    {sessionResults.accuracy < 80 && (
+                      <p className="text-sm text-yellow-400">⚠ Need 80%+ accuracy to complete</p>
                     )}
                   </div>
 

@@ -241,7 +241,8 @@ export const TypingProvider = ({ children }) => {
       level: calculateLevel(userData.xp + xpEarned)
     };
 
-    if (finalAccuracy >= 95) {
+    // Complete at 80% accuracy, but suggest 95%
+    if (finalAccuracy >= 80) {
       if (currentLesson && !userData.lessonsCompleted.includes(currentLesson.id)) {
         updatedData.lessonsCompleted = [...userData.lessonsCompleted, currentLesson.id];
       }
