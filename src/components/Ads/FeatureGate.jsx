@@ -8,12 +8,10 @@ import AdUnlockService from '../../services/adUnlockService';
  * Wrapper component that gates premium features
  * Shows content if premium OR ad-unlocked, otherwise shows unlock prompt
  */
-const FeatureGate = ({ 
-  featureId, 
-  isPremium, 
+const FeatureGate = ({
+  featureId,
   onUnlock,
-  onUpgradeToPremium,
-  children 
+  children
 }) => {
   const [showUnlockModal, setShowUnlockModal] = useState(false);
   const [isUnlocked, setIsUnlocked] = useState(false);
@@ -21,20 +19,20 @@ const FeatureGate = ({
 
   useEffect(() => {
     checkAccess();
-    
+
     // Update time remaining every second
     const interval = setInterval(() => {
       checkAccess();
     }, 1000);
 
     return () => clearInterval(interval);
-  }, [featureId, isPremium]);
+  }, [featureId]);
 
   const checkAccess = () => {
-    const accessible = AdUnlockService.isFeatureAccessible(featureId, isPremium);
+    const accessible = AdUnlockService.isFeatureAccessible(featureId);
     setIsUnlocked(accessible);
-    
-    if (accessible && !isPremium) {
+
+    if (accessible) {
       const time = AdUnlockService.getFormattedTimeRemaining(featureId);
       setTimeRemaining(time);
     }
@@ -48,11 +46,6 @@ const FeatureGate = ({
     checkAccess();
     if (onUnlock) onUnlock();
   };
-
-  // Premium users get direct access
-  if (isPremium) {
-    return <>{children}</>;
-  }
 
   // Ad-unlocked users get access with timer badge
   if (isUnlocked) {
@@ -79,15 +72,15 @@ const FeatureGate = ({
         <div className="w-16 h-16 bg-cyan-500/10 rounded-full flex items-center justify-center mx-auto mb-4">
           <Lock className="w-8 h-8 text-cyan-400" />
         </div>
-        
+
         <h3 className="text-lg font-bold mb-2">
-          {AdUnlockService.getProgress(featureId).current > 0 
-            ? 'Continue Unlocking' 
+          {AdUnlockService.getProgress(featureId).current > 0
+            ? 'Continue Unlocking'
             : 'Unlock This Feature'}
         </h3>
-        
+
         <p className="text-gray-400 text-sm mb-4">
-          Watch ads to unlock temporarily or upgrade to Premium
+          Watch ads to unlock temporarily
         </p>
 
         <button
@@ -96,15 +89,6 @@ const FeatureGate = ({
         >
           🎬 Watch Ads to Unlock
         </button>
-
-        <div className="mt-3">
-          <button
-            onClick={onUpgradeToPremium}
-            className="text-sm text-yellow-400 hover:text-yellow-300 font-semibold"
-          >
-            or Get Premium ₹19 →
-          </button>
-        </div>
       </div>
 
       {showUnlockModal && (
@@ -112,7 +96,6 @@ const FeatureGate = ({
           featureId={featureId}
           onClose={() => setShowUnlockModal(false)}
           onUnlock={handleUnlocked}
-          onUpgradeToPremium={onUpgradeToPremium}
         />
       )}
     </>

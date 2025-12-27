@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { X, Clock, Crown } from 'lucide-react';
+import { X, Clock } from 'lucide-react';
 import AdRewarded from './AdRewarded';
 import AdUnlockService from '../../services/adUnlockService';
 import AdService from '../../services/adService';
@@ -9,11 +9,10 @@ import { AD_UNLOCK_CONFIG } from '../../config/adUnlockConfig';
  * AdUnlockModal Component
  * Modal for unlocking premium features by watching ads
  */
-const AdUnlockModal = ({ 
-  featureId, 
-  onClose, 
+const AdUnlockModal = ({
+  featureId,
+  onClose,
   onUnlock,
-  onUpgradeToPremium 
 }) => {
   const [showAd, setShowAd] = useState(false);
   const [progress, setProgress] = useState({ current: 0, required: 0, unlocked: false });
@@ -25,7 +24,7 @@ const AdUnlockModal = ({
 
   useEffect(() => {
     updateStatus();
-    
+
     // Update time remaining every second if unlocked
     const interval = setInterval(() => {
       updateStatus();
@@ -38,7 +37,7 @@ const AdUnlockModal = ({
     const status = AdUnlockService.getFeatureUnlock(featureId);
     const prog = AdUnlockService.getProgress(featureId);
     const cooldown = AdService.getRewardedAdCooldown(featureId);
-    
+
     setUnlockStatus(status);
     setProgress(prog);
     setCooldownRemaining(cooldown);
@@ -57,7 +56,7 @@ const AdUnlockModal = ({
     // Record ad watched
     const result = AdUnlockService.recordAdWatched(featureId);
     AdService.recordRewardedAdWatched(featureId);
-    
+
     setShowAd(false);
     updateStatus();
 
@@ -98,7 +97,7 @@ const AdUnlockModal = ({
             <h2 className="text-2xl font-bold mb-1">{feature.name}</h2>
             <p className="text-gray-400 text-sm">{feature.description}</p>
           </div>
-          <button 
+          <button
             onClick={onClose}
             className="text-gray-400 hover:text-white text-xl"
           >
@@ -134,7 +133,7 @@ const AdUnlockModal = ({
                 </span>
               </div>
               <div className="h-3 bg-gray-700 rounded-full overflow-hidden">
-                <div 
+                <div
                   className="h-full bg-gradient-to-r from-cyan-500 to-blue-600 transition-all duration-500"
                   style={{ width: `${(progress.current / progress.required) * 100}%` }}
                 />
@@ -147,8 +146,8 @@ const AdUnlockModal = ({
               disabled={cooldownRemaining > 0}
               className="w-full py-3 bg-gradient-to-r from-cyan-500 to-blue-600 rounded-xl font-bold hover:shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {cooldownRemaining > 0 
-                ? `Wait ${cooldownRemaining}s` 
+              {cooldownRemaining > 0
+                ? `Wait ${cooldownRemaining}s`
                 : `Watch Ad (${progress.current + 1}/${progress.required})`
               }
             </button>
@@ -161,19 +160,6 @@ const AdUnlockModal = ({
           </div>
         )}
 
-        {/* Premium Option */}
-        <div className="border-t border-gray-700 pt-4">
-          <p className="text-sm text-gray-400 text-center mb-3">
-            Or get permanent access with Premium
-          </p>
-          <button
-            onClick={onUpgradeToPremium}
-            className="w-full py-3 bg-gradient-to-r from-yellow-500 to-orange-500 rounded-xl font-bold hover:shadow-lg transition-all flex items-center justify-center gap-2"
-          >
-            <Crown className="w-5 h-5" />
-            Get Premium - ₹19
-          </button>
-        </div>
       </div>
     </div>
   );
