@@ -7,11 +7,11 @@ import { AD_CONFIG } from '../../config/adConfig';
  */
 const AdBanner = ({ adSlot, size = '728x90', className = '' }) => {
   const [width, height] = size.split('x').map(Number);
-  
+
   // In test mode, show placeholder
-  if (AD_CONFIG.testMode) {
+  if (!AD_CONFIG || AD_CONFIG.testMode) {
     return (
-      <div 
+      <div
         className={`bg-gray-800/50 border-2 border-dashed border-gray-700 rounded-lg flex items-center justify-center ${className}`}
         style={{ width: `${width}px`, height: `${height}px`, maxWidth: '100%' }}
       >
@@ -30,9 +30,9 @@ const AdBanner = ({ adSlot, size = '728x90', className = '' }) => {
   //      style={{ display: 'inline-block', width: `${width}px`, height: `${height}px` }}
   //      data-ad-client={AD_CONFIG.adsense.publisherId}
   //      data-ad-slot={adSlot}></ins>
-  
+
   return (
-    <div 
+    <div
       className={`bg-gray-800/30 border border-gray-700 rounded-lg flex items-center justify-center ${className}`}
       style={{ width: `${width}px`, height: `${height}px`, maxWidth: '100%' }}
     >

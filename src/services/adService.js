@@ -23,7 +23,7 @@ const AdService = {
    */
   shouldShowInterstitial(sessionCount) {
     if (!this.shouldShowAds()) return false;
-    return sessionCount > 0 && sessionCount % AD_CONFIG.rules.interstitialFrequency === 0;
+    return sessionCount > 0 && AD_CONFIG?.rules?.interstitialFrequency && sessionCount % AD_CONFIG.rules.interstitialFrequency === 0;
   },
 
   /**
@@ -32,6 +32,7 @@ const AdService = {
    * @returns {boolean} Should show ad after this lesson
    */
   shouldShowLessonListAd(lessonIndex) {
+    if (!AD_CONFIG?.rules?.lessonListAdInterval) return false;
     return (lessonIndex + 1) % AD_CONFIG.rules.lessonListAdInterval === 0;
   },
 
