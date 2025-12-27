@@ -3,7 +3,7 @@ import { Trophy, Target, Zap, TrendingUp, Award, Flame, Star, Clock, CheckCircle
 
 // Import data, utilities, and components
 import { ESSAYS, LESSONS, TECHNICAL_DOCS, ACHIEVEMENTS } from './data';
-import { formatTime, StorageService, generateId } from './utils/helpers';
+import { formatTime, generateId } from './utils/helpers';
 import ThemeToggle from './components/ThemeToggle';
 import Stats from './components/Stats';
 import TypingArea from './components/TypingArea';
