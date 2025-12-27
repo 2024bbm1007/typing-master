@@ -30,16 +30,56 @@ const StorageService = {
   },
 
   getUserData() {
-    const storedData = this.get(this.KEYS.USER_DATA);
-    if (!storedData) return this.getDefaultUserData();
+    try {
+      const storedData = this.get(this.KEYS.USER_DATA);
+      if (!storedData) return this.getDefaultUserData();
 
-    // Merge stored data with default data to ensure all fields exist
-    // This handles backward compatibility when new fields are added
-    const merged = { ...this.getDefaultUserData(), ...storedData };
-    // Explicitly remove legacy premium fields if they exist
-    delete merged.isPremium;
-    delete merged.premiumUntil;
-    return merged;
+      // Merge stored data with default data to ensure all fields exist
+      // This handles backward compatibility when new fields are added
+      const defaults = this.getDefaultUserData();
+      const merged = { ...defaults, ...storedData };
+
+      // Validate and fix array fields - ensure they are actually arrays
+      const arrayFields = [
+        'achievements', 'lessonsCompleted', 'essaysCompleted',
+        'docsCompleted', 'sessionHistory', 'wpmHistory', 'accuracyHistory'
+      ];
+
+      arrayFields.forEach(field => {
+        if (!Array.isArray(merged[field])) {
+          console.warn(`Storage: Invalid ${field} data, resetting to default`);
+          merged[field] = defaults[field];
+        }
+      });
+
+      // Validate keyErrors is an object
+      if (typeof merged.keyErrors !== 'object' || merged.keyErrors === null) {
+        merged.keyErrors = {};
+      }
+
+      // Validate numeric fields
+      const numericFields = [
+        'bestWpm', 'averageWpm', 'averageAccuracy', 'totalSessions',
+        'totalTime', 'currentStreak', 'longestStreak', 'accuracyStreak', 'xp', 'level'
+      ];
+
+      numericFields.forEach(field => {
+        if (typeof merged[field] !== 'number' || isNaN(merged[field])) {
+          merged[field] = defaults[field];
+        }
+      });
+
+      // Explicitly remove legacy premium fields if they exist
+      delete merged.isPremium;
+      delete merged.premiumUntil;
+
+      return merged;
+    } catch (e) {
+      console.error('Storage: Error loading user data, resetting to defaults', e);
+      // Clear corrupted data and return fresh defaults
+      this.remove(this.KEYS.USER_DATA);
+      return this.getDefaultUserData();
+    }
   },
 
   setUserData(data) {
