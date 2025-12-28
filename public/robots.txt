@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://typing-master-pro.vercel.app/sitemap.xml
+Sitemap: https://2024bbm1007.github.io/typing-master/sitemap.xml

@@ -1,25 +1,32 @@
-import React, { useState, useMemo } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import React, { useState, lazy, Suspense } from 'react';
+import { Routes, Route, useNavigate, useLocation } from 'react-router-dom';
 import { Zap, Flame, Star, Home as HomeIcon, FileText, Code, Upload, BarChart3, Trophy, BookOpen } from 'lucide-react';
 
 import ThemeToggle from './components/ThemeToggle';
 import { AdBanner, AdInterstitial } from './components/Ads';
 import { useTyping } from './context/TypingContext';
 import { useUser } from './context/UserContext';
-import AdService from './services/adService';
 
-// Pages
-import Home from './pages/Home';
-import Lessons from './pages/Lessons';
-import Essays from './pages/Essays';
-import TechnicalDocs from './pages/TechnicalDocs';
-import CustomPractice from './pages/CustomPractice';
-import Analytics from './pages/Analytics';
-import Progress from './pages/Progress';
-import TypingPage from './pages/TypingPage';
-import Blog from './pages/Blog';
-import PrivacyPolicy from './pages/PrivacyPolicy';
+// Lazy load pages for better performance
+const Home = lazy(() => import('./pages/Home'));
+const Lessons = lazy(() => import('./pages/Lessons'));
+const Essays = lazy(() => import('./pages/Essays'));
+const TechnicalDocs = lazy(() => import('./pages/TechnicalDocs'));
+const CustomPractice = lazy(() => import('./pages/CustomPractice'));
+const Analytics = lazy(() => import('./pages/Analytics'));
+const Progress = lazy(() => import('./pages/Progress'));
+const TypingPage = lazy(() => import('./pages/TypingPage'));
+const Blog = lazy(() => import('./pages/Blog'));
+const BlogPost = lazy(() => import('./pages/BlogPost'));
+const PrivacyPolicy = lazy(() => import('./pages/PrivacyPolicy'));
+const NotFound = lazy(() => import('./pages/NotFound'));
 
+// Loading spinner component
+const PageLoader = () => (
+  <div className="flex items-center justify-center min-h-[50vh]">
+    <div className="w-12 h-12 border-4 border-cyan-500/30 border-t-cyan-500 rounded-full animate-spin"></div>
+  </div>
+);
 
 export default function TypingMasterApp() {
   const navigate = useNavigate();
@@ -31,12 +38,15 @@ export default function TypingMasterApp() {
   const [customText, setCustomText] = useState('');
   const [showInterstitial, setShowInterstitial] = useState(false);
 
-  // Derive mode from URL path
-  const mode = useMemo(() => {
-    const path = location.pathname.substring(1); // Remove leading '/'
+  // Get current mode from path for nav highlighting
+  const getCurrentMode = () => {
+    const path = location.pathname.substring(1) || 'home';
+    if (path.startsWith('blog/')) return 'blog';
     const validModes = ['home', 'lessons', 'essays', 'technical', 'custom', 'analytics', 'progress', 'typing', 'privacy', 'blog'];
     return validModes.includes(path) ? path : 'home';
-  }, [location.pathname]);
+  };
+
+  const mode = getCurrentMode();
 
   const setMode = (newMode) => {
     navigate(`/${newMode}`);
@@ -69,7 +79,7 @@ export default function TypingMasterApp() {
         <AdInterstitial
           onClose={() => setShowInterstitial(false)}
           onAdComplete={() => {
-            console.log('Interstitial ad completed');
+            // Ad completed
           }}
         />
       )}
@@ -176,27 +186,25 @@ export default function TypingMasterApp() {
         <AdBanner adSlot="headerBanner" size="728x90" />
       </div>
 
-      {/* Main Content */}
+      {/* Main Content with Routes */}
       <main className="max-w-7xl mx-auto px-4 py-6">
-        {mode === 'home' && (
-          <Home
-            setMode={setMode}
-            setShowCustomTextModal={setShowCustomTextModal}
-          />
-        )}
-        {mode === 'lessons' && <Lessons />}
-        {mode === 'essays' && <Essays />}
-        {mode === 'technical' && <TechnicalDocs />}
-        {mode === 'custom' && (
-          <CustomPractice
-            setShowCustomTextModal={setShowCustomTextModal}
-          />
-        )}
-        {mode === 'analytics' && <Analytics />}
-        {mode === 'progress' && <Progress />}
-        {mode === 'blog' && <Blog />}
-        {mode === 'typing' && <TypingPage />}
-        {mode === 'privacy' && <PrivacyPolicy />}
+        <Suspense fallback={<PageLoader />}>
+          <Routes>
+            <Route path="/" element={<Home setMode={setMode} setShowCustomTextModal={setShowCustomTextModal} />} />
+            <Route path="/home" element={<Home setMode={setMode} setShowCustomTextModal={setShowCustomTextModal} />} />
+            <Route path="/lessons" element={<Lessons />} />
+            <Route path="/essays" element={<Essays />} />
+            <Route path="/technical" element={<TechnicalDocs />} />
+            <Route path="/custom" element={<CustomPractice setShowCustomTextModal={setShowCustomTextModal} />} />
+            <Route path="/analytics" element={<Analytics />} />
+            <Route path="/progress" element={<Progress />} />
+            <Route path="/typing" element={<TypingPage />} />
+            <Route path="/blog" element={<Blog />} />
+            <Route path="/blog/:slug" element={<BlogPost />} />
+            <Route path="/privacy" element={<PrivacyPolicy />} />
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </Suspense>
       </main>
 
       {/* Footer Banner Ad */}
